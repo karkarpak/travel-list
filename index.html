@@ -83,8 +83,11 @@
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="{{ T.accent }}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"></path><path d="M11 6l-6 6 6 6"></path></svg>
         </div>
       </sc-if>
-      <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
-        <div style="width: 36px; height: 44px;"></div>
+      <sc-if value="{{ showHomeEdit }}" hint-placeholder-val="{{ true }}">
+        <div onClick="{{ startHomeEdit }}" style="min-width: 44px; height: 44px; display: flex; align-items: center; justify-content: flex-start; margin-left: -4px; padding: 0 4px; cursor: pointer; color: {{ T.accent }}; font-size: 16px; font-weight: 500;">{{ L.edit }}</div>
+      </sc-if>
+      <sc-if value="{{ showHomeDone }}" hint-placeholder-val="{{ false }}">
+        <div onClick="{{ endHomeEdit }}" style="min-width: 44px; height: 44px; display: flex; align-items: center; justify-content: flex-start; margin-left: -4px; padding: 0 4px; cursor: pointer; color: {{ T.accent }}; font-size: 16px; font-weight: 600;">{{ L.done }}</div>
       </sc-if>
       <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: {{ T.titleAlign }}; gap: 1px;">
         <div style="font-family: {{ T.displayF }}; font-stretch: {{ T.wide }}; font-size: {{ T.titleS }}; font-weight: {{ T.titleW }}; color: {{ T.titleC }}; letter-spacing: {{ T.titleLS }}; text-transform: {{ T.titleTT }};">{{ title }}</div>
@@ -122,14 +125,21 @@
         <div style="padding: 20px 20px 24px; display: flex; flex-direction: column; gap: 12px;">
           <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 2px;">
             <div style="flex: 1; font-family: {{ T.labelF }}; font-stretch: {{ T.wide }}; font-size: {{ T.labelS }}; font-weight: {{ T.labelW }}; color: {{ T.labelC }}; letter-spacing: {{ T.labelLS }}; text-transform: uppercase;">{{ tripsLabel }}</div>
-            <div onClick="{{ startCreate }}" style="display: flex; align-items: center; gap: 6px; padding: {{ T.pillPad }}; border: {{ T.pillBorder }}; border-radius: {{ T.pillR }}; background: {{ T.pillBg }}; box-shadow: {{ T.pillShadow }}; color: {{ T.pillInk }}; font-size: 14.5px; font-weight: {{ T.pillW }}; text-transform: {{ T.pillTT }}; letter-spacing: {{ T.pillLS }}; cursor: pointer;">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 6v12M6 12h12"></path></svg>
-              {{ L.newTrip }}
-            </div>
+            <sc-if value="{{ showNewTrip }}" hint-placeholder-val="{{ true }}">
+              <div onClick="{{ startCreate }}" style="display: flex; align-items: center; gap: 6px; padding: {{ T.pillPad }}; border: {{ T.pillBorder }}; border-radius: {{ T.pillR }}; background: {{ T.pillBg }}; box-shadow: {{ T.pillShadow }}; color: {{ T.pillInk }}; font-size: 14.5px; font-weight: {{ T.pillW }}; text-transform: {{ T.pillTT }}; letter-spacing: {{ T.pillLS }}; cursor: pointer;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 6v12M6 12h12"></path></svg>
+                {{ L.newTrip }}
+              </div>
+            </sc-if>
           </div>
           <sc-for list="{{ trips }}" as="t" hint-placeholder-count="2">
-            <div ref="{{ t.ref }}" style="border: {{ T.cardBorderW }} solid {{ t.border }}; border-radius: {{ T.cardR }}; padding: 16px 6px 16px 18px; display: flex; align-items: center; gap: 4px; background: {{ t.cardBg }}; position: relative; z-index: {{ t.z }}; box-shadow: {{ t.shadow }}; transition: transform 0.16s ease; transform: translateY({{ t.ty }}px);">
-              <div onClick="{{ t.open }}" style="flex: 1; display: flex; flex-direction: column; gap: 12px; cursor: pointer; min-width: 0;">
+            <div style="border: {{ T.cardBorderW }} solid {{ t.border }}; border-radius: {{ T.cardR }}; padding: 16px 10px 16px 12px; display: flex; align-items: center; gap: 8px; background: {{ t.cardBg }}; position: relative; box-shadow: {{ t.shadow }};">
+              <sc-if value="{{ homeEditing }}" hint-placeholder-val="{{ false }}">
+                <div onClick="{{ t.remove }}" style="width: 28px; height: 28px; border-radius: 50%; background: {{ T.danger }}; display: flex; align-items: center; justify-content: center; cursor: pointer; flex: none;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"><path d="M6 12h12"></path></svg>
+                </div>
+              </sc-if>
+              <div onClick="{{ t.open }}" style="flex: 1; display: flex; flex-direction: column; gap: 12px; cursor: {{ t.cardCursor }}; min-width: 0;">
                 <div style="display: flex; align-items: flex-start; gap: 12px;">
                   <div style="flex: 1; display: flex; flex-direction: column; gap: 5px; min-width: 0;">
                     <div style="display: flex; align-items: center; gap: 7px; min-width: 0;">
@@ -145,15 +155,24 @@
                       <div style="height: 18px;"></div>
                     </sc-if>
                   </div>
-                  <div style="font-size: 13px; font-weight: {{ t.countWeight }}; color: {{ t.countColor }}; padding-top: 4px; white-space: nowrap;">{{ t.countLabel }}</div>
+                  <sc-if value="{{ homeBrowsing }}" hint-placeholder-val="{{ true }}">
+                    <div style="font-size: 13px; font-weight: {{ t.countWeight }}; color: {{ t.countColor }}; padding-top: 4px; white-space: nowrap;">{{ t.countLabel }}</div>
+                  </sc-if>
                 </div>
                 <div style="height: {{ T.barH }}; border-radius: 999px; background: {{ T.barTrack }}; border: {{ T.barBorder }}; overflow: hidden;">
                   <div style="height: 100%; background: {{ t.barColor }}; border-radius: 999px; width: {{ t.pct }}%;"></div>
                 </div>
               </div>
-              <div onPointerDown="{{ t.dragStart }}" onPointerMove="{{ t.dragMove }}" onPointerUp="{{ t.dragEnd }}" onPointerCancel="{{ t.dragEnd }}" style="width: 40px; height: 56px; display: flex; align-items: center; justify-content: center; cursor: grab; touch-action: none; flex: none;">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c7cdcb" stroke-width="2" stroke-linecap="round"><path d="M4 9h16M4 15h16"></path></svg>
-              </div>
+              <sc-if value="{{ homeEditing }}" hint-placeholder-val="{{ false }}">
+                <div style="display: flex; flex-direction: column; gap: 2px; flex: none;">
+                  <div onClick="{{ t.moveUp }}" style="width: 36px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: {{ t.upCursor }}; opacity: {{ t.upOpacity }};">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="{{ T.ink }}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 14l6-6 6 6"></path></svg>
+                  </div>
+                  <div onClick="{{ t.moveDown }}" style="width: 36px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: {{ t.downCursor }}; opacity: {{ t.downOpacity }};">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="{{ T.ink }}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 10l6 6 6-6"></path></svg>
+                  </div>
+                </div>
+              </sc-if>
             </div>
           </sc-for>
           <sc-if value="{{ noTrips }}" hint-placeholder-val="{{ false }}">
@@ -1080,7 +1099,7 @@ class Component extends DCLogic {
       autoCollapse: props.autoCollapseDone !== false,
       collapsed: {},
       swiped: null,
-      drag: null,
+      homeEditing: false,
       draft: { name: '', start: '', end: '', tpl: 'short' },
       newItem: { id: null, name: '', cat: 'misc' },
       tplDraft: { name: '', cat: 'misc' },
@@ -1092,8 +1111,6 @@ class Component extends DCLogic {
     };
     this.px = 0;
     this.py = 0;
-    this.rows = {};
-    this.moved = false;
   }
 
   measureScroll() {
@@ -1201,7 +1218,22 @@ class Component extends DCLogic {
   editedTpl() { return this.tpls().filter(t => t.id === this.state.editTplId)[0] || null; }
 
   go(screen, extra) {
-    this.setState({ screen: screen, swiped: null, sheet: null, drag: null, ...(extra || {}) });
+    const next = { screen: screen, swiped: null, sheet: null, ...(extra || {}) };
+    if (screen !== 'home') next.homeEditing = false;
+    this.setState(next);
+  }
+
+  moveTrip(id, dir) {
+    this.setTrips(list => {
+      const i = list.findIndex(t => t.id === id);
+      const j = i + dir;
+      if (i < 0 || j < 0 || j >= list.length) return list;
+      const a = list.slice();
+      const tmp = a[i];
+      a[i] = a[j];
+      a[j] = tmp;
+      return a;
+    });
   }
 
   fmtDay(iso) {
@@ -1312,6 +1344,11 @@ class Component extends DCLogic {
     v.isTemplates = st.screen === 'templates';
     v.isTplEdit = st.screen === 'tplEdit';
     v.isTplItem = st.screen === 'tplItem';
+    v.homeEditing = !!st.homeEditing;
+    v.homeBrowsing = v.isHome && !st.homeEditing;
+    v.showHomeEdit = v.isHome && !st.homeEditing;
+    v.showHomeDone = v.isHome && !!st.homeEditing;
+    v.showNewTrip = !st.homeEditing;
     v.canGoBack = !v.isHome;
     v.plainHeaderRight = !v.isHome && !v.isTrip;
     v.title = v.isHome ? L.packingLists
@@ -1338,6 +1375,8 @@ class Component extends DCLogic {
     v.goBack = () => this.go(BACK[st.screen] || 'home');
     v.openSettings = () => this.go('settings');
     v.openTemplates = () => this.go('templates');
+    v.startHomeEdit = () => this.setState({ homeEditing: true });
+    v.endHomeEdit = () => this.setState({ homeEditing: false });
     v.startCreate = () => this.go('create', { draft: { name: '', start: '', end: '', tpl: 'short' }, editTripId: null });
     v.openAdd = () => this.go('add', { newItem: { id: null, name: '', cat: 'misc' } });
     v.openTripSheet = () => this.setState({ sheet: 'trip' });
@@ -1368,26 +1407,18 @@ class Component extends DCLogic {
       : st.trips.length + (st.trips.length === 1 ? ' trip' : ' trips');
     v.noTrips = st.trips.length === 0;
 
-    const drag = st.drag;
     v.showTripDates = this.props.showTripDates !== false;
     v.hideTripDates = this.props.showTripDates === false;
-    const ordered = st.trips.slice().sort((a, b) => {
-      const ca = a.items.length > 0 && a.items.every(x => x.done) ? 1 : 0;
-      const cb = b.items.length > 0 && b.items.every(x => x.done) ? 1 : 0;
-      return ca - cb;
-    });
+    const editingHome = !!st.homeEditing;
+    const ordered = st.trips.slice();
     v.trips = ordered.map((t, i) => {
       const total = t.items.length;
       const done = t.items.filter(x => x.done).length;
-      const isDragged = !!drag && drag.id === t.id;
-      let ty = 0;
-      if (drag && !isDragged) {
-        if (drag.over > drag.index && i > drag.index && i <= drag.over) ty = -drag.h;
-        else if (drag.over < drag.index && i >= drag.over && i < drag.index) ty = drag.h;
-      } else if (isDragged) { ty = drag.dy; }
       const range = [this.fmtDay(t.start), this.fmtDay(t.end)].filter(Boolean).join(' – ');
       const nl = this.nightsLabel(t.start, t.end);
       const complete = total > 0 && done === total;
+      const canUp = i > 0;
+      const canDown = i < ordered.length - 1;
       return {
         name: t.name,
         complete: complete,
@@ -1399,42 +1430,20 @@ class Component extends DCLogic {
         barColor: complete ? T.barDone : T.accent,
         cardBg: T.cardBg,
         pct: total ? Math.round((done / total) * 100) : 0,
-        ty: ty, z: isDragged ? 5 : 1,
         border: T.cardBorderC,
-        shadow: isDragged ? T.cardShadowDrag : T.cardShadow,
-        ref: el => { if (el) this.rows[t.id] = el; },
+        shadow: T.cardShadow,
+        cardCursor: editingHome ? 'default' : 'pointer',
+        upCursor: canUp ? 'pointer' : 'default',
+        downCursor: canDown ? 'pointer' : 'default',
+        upOpacity: canUp ? '1' : '0.25',
+        downOpacity: canDown ? '1' : '0.25',
         open: () => {
-          if (this.moved) { this.moved = false; return; }
+          if (this.state.homeEditing) return;
           this.go('trip', { activeId: t.id, hidePacked: !!this.props.hidePackedByDefault, collapsed: {} });
         },
-        dragStart: e => {
-          const el = this.rows[t.id];
-          const h = (el ? el.offsetHeight : 104) + 12;
-          this.py = e.clientY;
-          this.moved = false;
-          if (e.currentTarget.setPointerCapture) e.currentTarget.setPointerCapture(e.pointerId);
-          this.setState({ drag: { id: t.id, index: i, over: i, dy: 0, h: h } });
-        },
-        dragMove: e => {
-          const d = this.state.drag;
-          if (!d || d.id !== t.id) return;
-          const dy = e.clientY - this.py;
-          if (Math.abs(dy) > 4) this.moved = true;
-          const off = Math.round(dy / d.h);
-          const over = Math.max(0, Math.min(ordered.length - 1, d.index + off));
-          this.setState({ drag: { ...d, dy: dy, over: over } });
-        },
-        dragEnd: () => {
-          const d = this.state.drag;
-          if (d && d.over !== d.index) {
-            const a = ordered.slice();
-            const m = a.splice(d.index, 1)[0];
-            a.splice(d.over, 0, m);
-            this.setTrips(() => a);
-          }
-          this.setState({ drag: null });
-          setTimeout(() => { this.moved = false; }, 120);
-        }
+        remove: () => this.setTrips(list => list.filter(x => x.id !== t.id)),
+        moveUp: () => { if (canUp) this.moveTrip(t.id, -1); },
+        moveDown: () => { if (canDown) this.moveTrip(t.id, 1); }
       };
     });
 
