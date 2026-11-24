@@ -432,7 +432,7 @@
     </div>
 
     <sc-if value="{{ isTrip }}" hint-placeholder-val="{{ false }}">
-      <div style="flex: none; height: 32px; border-top: {{ T.footBorder }}; background: {{ T.footBg }}; padding: 0 20px; display: flex; align-items: center; gap: 12px;">
+      <div style="flex: none; height: 36px; box-sizing: border-box; border-top: {{ T.footBorder }}; background: {{ T.footBg }}; padding: 4px 20px 0; display: flex; align-items: center; gap: 12px;">
         <div style="display: flex; align-items: baseline; gap: 3px;">
           <div style="font-family: {{ T.displayF }}; font-stretch: {{ T.wide }}; font-size: 22px; font-weight: {{ T.counterW }}; color: {{ T.ink }}; letter-spacing: -0.03em; line-height: 1;">{{ doneCount }}</div>
           <div style="font-size: 13px; color: #a9afae; line-height: 1;">/ {{ totalCount }}</div>
