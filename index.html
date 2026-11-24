@@ -526,13 +526,13 @@
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:430,&quot;height&quot;:900},&quot;uiStyle&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;clean&quot;,&quot;maximalism&quot;,&quot;swiss&quot;,&quot;sbb&quot;,&quot;brutalism&quot;],&quot;default&quot;:&quot;clean&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Style&quot;},&quot;tickAnimation&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Style&quot;},&quot;showTripDates&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Behaviour&quot;},&quot;hidePackedByDefault&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Behaviour&quot;},&quot;autoCollapseDone&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Behaviour&quot;},&quot;completedStyle&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;fade&quot;,&quot;strikethrough&quot;],&quot;default&quot;:&quot;strikethrough&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Behaviour&quot;}}">
 const CATS = [
   { key: 'pretrip', en: 'Pre-trip tasks', zh: '行前事项', fr: 'Avant le départ' },
-  { key: 'docs', en: 'Documents & copies', zh: '文件/备份', fr: 'Documents & copies' },
+  { key: 'docs', en: 'Documents', zh: '文件', fr: 'Documents' },
   { key: 'money', en: 'Money', zh: '资金', fr: 'Argent' },
   { key: 'clothing', en: 'Clothing', zh: '服装', fr: 'Vêtements' },
   { key: 'swim', en: 'Swimming', zh: '游泳', fr: 'Natation' },
-  { key: 'toiletries', en: 'Toiletries', zh: '个护/化妆', fr: 'Trousse de toilette' },
-  { key: 'health', en: 'Health & meds', zh: '医疗/健康', fr: 'Santé & médicaments' },
-  { key: 'tech', en: 'Electronics', zh: '电子/数码', fr: 'Électronique' },
+  { key: 'toiletries', en: 'Toiletries', zh: '个护化妆', fr: 'Trousse de toilette' },
+  { key: 'health', en: 'Health', zh: '医疗健康', fr: 'Santé' },
+  { key: 'tech', en: 'Electronics', zh: '电子数码', fr: 'Électronique' },
   { key: 'snow', en: 'Ski & snow gear', zh: '滑雪装备', fr: 'Matériel de ski' },
   { key: 'misc', en: 'Other', zh: '杂项', fr: 'Divers' },
   { key: 'notes', en: 'Travel notes', zh: '旅途备忘', fr: 'Notes de voyage' }
@@ -1067,7 +1067,13 @@ function catFromLabel(raw) {
   CATS.forEach(c => {
     if (s === c.key || s === c.en.toLowerCase() || s === c.zh.toLowerCase() || s === c.fr.toLowerCase()) hit = c.key;
   });
-  const ALIAS = { '文件': 'docs', '个护': 'toiletries', '医疗健康': 'health', '电子产品': 'tech', 'toilette': 'toiletries' };
+  const ALIAS = {
+    '文件': 'docs', '文件/备份': 'docs', 'documents & copies': 'docs',
+    '个护': 'toiletries', '个护化妆': 'toiletries', '个护/化妆': 'toiletries',
+    '医疗健康': 'health', '医疗/健康': 'health', 'health & meds': 'health',
+    '电子数码': 'tech', '电子/数码': 'tech', '电子产品': 'tech',
+    'toilette': 'toiletries'
+  };
   if (ALIAS[s]) hit = ALIAS[s];
   return hit;
 }
