@@ -84,10 +84,10 @@
         </div>
       </sc-if>
       <sc-if value="{{ showHomeEdit }}" hint-placeholder-val="{{ true }}">
-        <div onClick="{{ startHomeEdit }}" style="height: 44px; display: flex; align-items: center; justify-content: flex-start; padding-right: 8px; cursor: pointer; font-family: {{ T.font }}; font-size: 14.5px; font-weight: 400; color: {{ T.sub }}; letter-spacing: -0.01em;">{{ L.edit }}</div>
+        <div onClick="{{ startHomeEdit }}" style="height: 44px; display: flex; align-items: center; justify-content: center; padding: 0 6px; margin-left: -6px; border-radius: 10px; cursor: pointer; font-family: {{ T.font }}; font-size: 14.5px; font-weight: 400; color: {{ T.sub }}; letter-spacing: -0.01em; -webkit-tap-highlight-color: rgba(0,0,0,0.1);">{{ L.edit }}</div>
       </sc-if>
       <sc-if value="{{ showHomeDone }}" hint-placeholder-val="{{ false }}">
-        <div onClick="{{ endHomeEdit }}" style="height: 44px; display: flex; align-items: center; justify-content: flex-start; padding-right: 8px; cursor: pointer; font-family: {{ T.font }}; font-size: 14.5px; font-weight: 400; color: {{ T.sub }}; letter-spacing: -0.01em;">{{ L.done }}</div>
+        <div onClick="{{ endHomeEdit }}" style="height: 44px; display: flex; align-items: center; justify-content: center; padding: 0 6px; margin-left: -6px; border-radius: 10px; cursor: pointer; font-family: {{ T.font }}; font-size: 14.5px; font-weight: 400; color: {{ T.sub }}; letter-spacing: -0.01em; -webkit-tap-highlight-color: rgba(0,0,0,0.1);">{{ L.done }}</div>
       </sc-if>
       <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: {{ T.titleAlign }}; justify-content: center; gap: 1px;">
         <div style="font-family: {{ T.displayF }}; font-stretch: {{ T.wide }}; font-size: {{ T.titleS }}; font-weight: {{ T.titleW }}; color: {{ T.titleC }}; letter-spacing: {{ T.titleLS }}; text-transform: {{ T.titleTT }}; line-height: 1.2;">{{ title }}</div>
@@ -96,7 +96,7 @@
         </sc-if>
       </div>
       <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
-        <div onClick="{{ openSettings }}" style="height: 44px; min-width: 44px; display: flex; align-items: center; justify-content: flex-end; padding-left: 8px; cursor: pointer;">
+        <div onClick="{{ openSettings }}" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; margin-right: -10px; border-radius: 10px; cursor: pointer; -webkit-tap-highlight-color: rgba(0,0,0,0.1);">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="{{ T.sub }}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h9M18.5 8H20M4 16h3.5M13 16h7"></path><circle cx="15.5" cy="8" r="2.4"></circle><circle cx="10" cy="16" r="2.4"></circle></svg>
         </div>
       </sc-if>
@@ -119,7 +119,7 @@
     <sc-if value="{{ scrollThumbShow }}" hint-placeholder-val="{{ false }}">
       <div style="position: absolute; right: 3px; width: 3px; border-radius: 2px; background: rgba(28,31,29,0.3); z-index: 3; pointer-events: none; top: {{ scrollThumbTop }}px; height: {{ scrollThumbH }}px;"></div>
     </sc-if>
-    <div data-scroll="1" ref="{{ scrollRef }}" onScroll="{{ onScroll }}" style="flex: 1; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch;">
+    <div data-scroll="1" ref="{{ scrollRef }}" onScroll="{{ onScroll }}" style="flex: 1; overflow-y: {{ scrollOverflow }}; overflow-x: hidden; -webkit-overflow-scrolling: touch; touch-action: {{ scrollTouch }};">
 
       <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
         <div style="padding: 20px 20px 24px; display: flex; flex-direction: column; gap: 12px;">
@@ -133,9 +133,9 @@
             </sc-if>
           </div>
           <sc-for list="{{ trips }}" as="t" hint-placeholder-count="2">
-            <div ref="{{ t.ref }}" style="display: flex; align-items: center; gap: 8px; position: relative; z-index: {{ t.z }};">
+            <div ref="{{ t.ref }}" style="display: flex; align-items: center; position: relative; z-index: {{ t.z }}; transition: {{ t.transition }}; transform: translateY({{ t.ty }}px); will-change: transform;">
               <sc-if value="{{ homeEditing }}" hint-placeholder-val="{{ false }}">
-                <div onClick="{{ t.askDelete }}" style="width: 30px; height: 30px; border-radius: 50%; background: #ff3b30; display: flex; align-items: center; justify-content: center; cursor: pointer; flex: none;">
+                <div onClick="{{ t.askDelete }}" style="width: 30px; height: 30px; margin-right: 10px; border-radius: 50%; background: #ff3b30; display: flex; align-items: center; justify-content: center; cursor: pointer; flex: none;">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><path d="M6 12h12"></path></svg>
                 </div>
               </sc-if>
@@ -164,11 +164,11 @@
                 </div>
               </div>
               <sc-if value="{{ homeEditing }}" hint-placeholder-val="{{ false }}">
-                <div onPointerDown="{{ t.dragStart }}" onPointerMove="{{ t.dragMove }}" onPointerUp="{{ t.dragEnd }}" onPointerCancel="{{ t.dragEnd }}" style="width: 30px; height: 44px; display: flex; align-items: center; justify-content: center; cursor: grab; touch-action: none; flex: none; user-select: none; -webkit-user-select: none;">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="#c5cbc9" aria-hidden="true">
-                    <rect x="5" y="6.8" width="14" height="1.5" rx="0.75"></rect>
-                    <rect x="5" y="11.25" width="14" height="1.5" rx="0.75"></rect>
-                    <rect x="5" y="15.7" width="14" height="1.5" rx="0.75"></rect>
+                <div onPointerDown="{{ t.dragStart }}" onPointerMove="{{ t.dragMove }}" onPointerUp="{{ t.dragEnd }}" onPointerCancel="{{ t.dragEnd }}" style="height: 44px; margin-left: 10px; display: flex; align-items: center; justify-content: center; cursor: grab; touch-action: none; flex: none; user-select: none; -webkit-user-select: none;">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="#c5cbc9" aria-hidden="true">
+                    <rect x="4" y="6.5" width="16" height="2" rx="1"></rect>
+                    <rect x="4" y="11" width="16" height="2" rx="1"></rect>
+                    <rect x="4" y="15.5" width="16" height="2" rx="1"></rect>
                   </svg>
                 </div>
               </sc-if>
@@ -1359,6 +1359,8 @@ class Component extends DCLogic {
     v.plainHeaderRight = !v.isHome && !v.isTrip;
     // Home content uses 20px side padding — keep header actions on the same edge.
     v.headerPad = v.isHome ? '8px 20px 14px' : T.headPad;
+    v.scrollOverflow = st.drag ? 'hidden' : 'auto';
+    v.scrollTouch = st.drag ? 'none' : 'pan-y';
     v.title = v.isHome ? L.packingLists
       : v.isCreate ? (st.editTripId ? L.editTrip : L.newTrip)
       : v.isAdd ? (st.newItem.id ? L.editItem : L.addItem)
@@ -1429,13 +1431,20 @@ class Component extends DCLogic {
     const editingHome = !!st.homeEditing;
     const drag = st.drag;
     const ordered = st.trips.slice();
-    v.trips = ordered.map((t) => {
+    v.trips = ordered.map((t, i) => {
       const total = t.items.length;
       const done = t.items.filter(x => x.done).length;
       const range = [this.fmtDay(t.start), this.fmtDay(t.end)].filter(Boolean).join(' – ');
       const nl = this.nightsLabel(t.start, t.end);
       const complete = total > 0 && done === total;
       const isDragged = !!drag && drag.id === t.id;
+      let ty = 0;
+      if (drag && !isDragged) {
+        if (drag.over > drag.index && i > drag.index && i <= drag.over) ty = -drag.h;
+        else if (drag.over < drag.index && i >= drag.over && i < drag.index) ty = drag.h;
+      } else if (isDragged) {
+        ty = drag.dy;
+      }
       return {
         name: t.name,
         complete: complete,
@@ -1450,6 +1459,8 @@ class Component extends DCLogic {
         border: T.cardBorderC,
         shadow: isDragged ? T.cardShadowDrag : T.cardShadow,
         cardCursor: editingHome ? 'default' : 'pointer',
+        ty: ty,
+        transition: isDragged ? 'none' : (drag ? 'transform 0.18s ease' : 'none'),
         z: isDragged ? 5 : 1,
         ref: el => { if (el) this.rows[t.id] = el; },
         open: () => {
@@ -1459,33 +1470,42 @@ class Component extends DCLogic {
         askDelete: () => this.setState({ confirmDeleteId: t.id, drag: null }),
         dragStart: e => {
           e.preventDefault();
+          e.stopPropagation();
           const el = this.rows[t.id];
-          this.dragH = (el ? el.offsetHeight : 104) + 12;
+          const h = (el ? el.offsetHeight : 104) + 12;
           this.py = e.clientY;
           this.dragId = t.id;
           this.moved = false;
+          this._dragOver = i;
           if (e.currentTarget.setPointerCapture) e.currentTarget.setPointerCapture(e.pointerId);
-          this.setState({ drag: { id: t.id } });
+          this.setState({ drag: { id: t.id, index: i, over: i, dy: 0, h: h } });
         },
         dragMove: e => {
           if (this.dragId !== t.id) return;
+          const d = this.state.drag;
+          if (!d || d.id !== t.id) return;
           const dy = e.clientY - this.py;
           if (Math.abs(dy) > 4) this.moved = true;
-          if (Math.abs(dy) < this.dragH * 0.55) return;
-          const dir = dy > 0 ? 1 : -1;
-          this.py = e.clientY;
-          this.setTrips(list => {
-            const i = list.findIndex(x => x.id === t.id);
-            const j = i + dir;
-            if (i < 0 || j < 0 || j >= list.length) return list;
-            const a = list.slice();
-            const m = a.splice(i, 1)[0];
-            a.splice(j, 0, m);
-            return a;
-          });
+          const over = Math.max(0, Math.min(ordered.length - 1, d.index + Math.round(dy / d.h)));
+          // Follow the finger every frame; only skip redundant React updates.
+          if (d.dy === dy && d.over === over) return;
+          this._dragOver = over;
+          this.setState({ drag: { ...d, dy: dy, over: over } });
         },
         dragEnd: () => {
+          const d = this.state.drag;
+          const from = d ? d.index : -1;
+          const to = d ? d.over : -1;
           this.dragId = null;
+          if (d && from !== to && from >= 0 && to >= 0) {
+            this.setTrips(list => {
+              const a = list.slice();
+              if (from >= a.length) return list;
+              const m = a.splice(from, 1)[0];
+              a.splice(to, 0, m);
+              return a;
+            });
+          }
           this.setState({ drag: null });
           setTimeout(() => { this.moved = false; }, 120);
         }
