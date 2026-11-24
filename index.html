@@ -15,6 +15,12 @@
   }
   /* Phone / narrow screens: fill the whole visual viewport, no gray canvas around the shell */
   @media (pointer: coarse), (max-width: 600px) {
+    html, body {
+      overflow: hidden !important;
+      overscroll-behavior: none;
+      height: 100%;
+      height: 100dvh;
+    }
     html, body, #dc-root, #dc-root > .sc-host {
       height: 100%;
       min-height: 100%;
@@ -120,7 +126,7 @@
     <sc-if value="{{ scrollThumbShow }}" hint-placeholder-val="{{ false }}">
       <div style="position: absolute; right: 3px; width: 3px; border-radius: 2px; background: rgba(28,31,29,0.3); z-index: 3; pointer-events: none; top: {{ scrollThumbTop }}px; height: {{ scrollThumbH }}px;"></div>
     </sc-if>
-    <div data-scroll="1" ref="{{ scrollRef }}" onScroll="{{ onScroll }}" style="flex: 1; overflow-y: {{ scrollOverflow }}; overflow-x: hidden; -webkit-overflow-scrolling: touch; touch-action: {{ scrollTouch }};">
+    <div data-scroll="1" ref="{{ scrollRef }}" onScroll="{{ onScroll }}" style="flex: 1; overflow-y: scroll; overflow-x: hidden; -webkit-overflow-scrolling: touch; overscroll-behavior: contain;">
 
       <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
         <div style="padding: 20px 20px 24px; display: flex; flex-direction: column; gap: 12px;">
@@ -399,16 +405,10 @@
           </div>
 
           <div style="font-size: 13px; color: {{ T.sub }}; letter-spacing: 0.02em; text-transform: uppercase; padding: 28px 20px 8px;">{{ L.listBehaviour }}</div>
-          <div onClick="{{ toggleDefaultUnpacked }}" style="display: flex; align-items: center; gap: 14px; padding: 16px 20px; border-top: {{ T.divStrong }}; cursor: pointer;">
+          <div onClick="{{ toggleDefaultUnpacked }}" style="display: flex; align-items: center; gap: 14px; padding: 16px 20px; border-top: {{ T.divStrong }}; border-bottom: {{ T.divStrong }}; cursor: pointer;">
             <div style="flex: 1; font-size: 16px; color: {{ T.ink }};">{{ L.hidePackedDefault }}</div>
             <div style="width: 50px; height: 30px; border-radius: {{ T.toggleR }}; background: {{ s1bg }}; padding: 3px; flex: none; transition: background 0.2s;">
               <div style="width: 24px; height: 24px; border-radius: {{ T.knobR }}; background: #fff; box-shadow: {{ T.knobShadow }}; transition: transform 0.2s; transform: translateX({{ s1x }}px);"></div>
-            </div>
-          </div>
-          <div onClick="{{ toggleAutoCollapse }}" style="display: flex; align-items: center; gap: 14px; padding: 16px 20px; border-top: {{ T.divStrong }}; cursor: pointer;">
-            <div style="flex: 1; font-size: 16px; color: {{ T.ink }};">{{ L.collapseWhenDone }}</div>
-            <div style="width: 50px; height: 30px; border-radius: {{ T.toggleR }}; background: {{ s2bg }}; padding: 3px; flex: none; transition: background 0.2s;">
-              <div style="width: 24px; height: 24px; border-radius: {{ T.knobR }}; background: #fff; box-shadow: {{ T.knobShadow }}; transition: transform 0.2s; transform: translateX({{ s2x }}px);"></div>
             </div>
           </div>
 
@@ -1116,7 +1116,6 @@ class Component extends DCLogic {
       activeId: null,
       editTplId: null,
       hidePacked: !!props.hidePackedByDefault,
-      autoCollapse: props.autoCollapseDone !== false,
       collapsed: {},
       swiped: null,
       homeEditing: false,
@@ -1144,7 +1143,11 @@ class Component extends DCLogic {
     if (!el) return;
     const next = { t: el.scrollTop, h: el.scrollHeight, c: el.clientHeight };
     const cur = this.state.sc || {};
-    if (cur.t !== next.t || cur.h !== next.h || cur.c !== next.c) this.setState({ sc: next });
+    if (cur.t === next.t && cur.h === next.h && cur.c === next.c) return;
+    // Avoid scroll-jank loops: only push thumb state when size changes, or when thumb is visible.
+    const needThumb = next.h > next.c + 4;
+    if (!needThumb && !(cur.h > cur.c + 4) && cur.h === next.h && cur.c === next.c) return;
+    this.setState({ sc: next });
   }
 
   componentDidMount() {
@@ -1365,8 +1368,6 @@ class Component extends DCLogic {
     v.canGoBack = !v.isHome;
     // Home content uses 20px side padding — keep header actions on the same edge.
     v.headerPad = '0 20px';
-    v.scrollOverflow = st.drag ? 'hidden' : 'auto';
-    v.scrollTouch = st.drag ? 'none' : 'pan-y';
     v.title = v.isHome ? L.packingLists
       : v.isCreate ? (st.editTripId ? L.editTrip : L.newTrip)
       : v.isAdd ? (st.newItem.id ? L.editItem : L.addItem)
@@ -1503,6 +1504,7 @@ class Component extends DCLogic {
           const from = d ? d.index : -1;
           const to = d ? d.over : -1;
           this.dragId = null;
+          this.py = 0;
           if (d && from !== to && from >= 0 && to >= 0) {
             this.setTrips(list => {
               const a = list.slice();
@@ -1512,7 +1514,7 @@ class Component extends DCLogic {
               return a;
             });
           }
-          this.setState({ drag: null });
+          if (this.state.drag) this.setState({ drag: null });
           setTimeout(() => { this.moved = false; }, 120);
         }
       };
@@ -1576,8 +1578,7 @@ class Component extends DCLogic {
       v.groups = CATS.filter(c => trip.items.some(i => i.cat === c.key)).map(c => {
         const all = trip.items.filter(i => i.cat === c.key);
         const cdone = all.filter(i => i.done).length;
-        const autoClosed = st.autoCollapse && all.length > 0 && cdone === all.length && st.collapsed[c.key] === undefined;
-        const open = st.collapsed[c.key] === undefined ? !autoClosed : !st.collapsed[c.key];
+        const open = !st.collapsed[c.key];
         const shown = st.hidePacked ? all.filter(i => !i.done) : all;
         return {
           label: this.catLabel(c),
@@ -1764,10 +1765,7 @@ class Component extends DCLogic {
 
     v.s1bg = st.hidePacked ? T.accent : T.toggleOff;
     v.s1x = st.hidePacked ? 20 : 0;
-    v.s2bg = st.autoCollapse ? T.accent : T.toggleOff;
-    v.s2x = st.autoCollapse ? 20 : 0;
     v.toggleDefaultUnpacked = () => this.setState(s => ({ hidePacked: !s.hidePacked }));
-    v.toggleAutoCollapse = () => this.setState(s => ({ autoCollapse: !s.autoCollapse, collapsed: {} }));
     v.askResetAll = () => { this.setTrips(list => list.map(t => ({ ...t, items: t.items.map(x => ({ ...x, done: false })) }))); this.setState({ collapsed: {} }); };
     v.askWipe = () => { this.setTrips(() => []); this.go('home', { activeId: null }); };
 
