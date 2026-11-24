@@ -1,0 +1,1658 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&amp;family=Archivo:wdth,wght@100,400;100,700;100,800;125,700;125,800&amp;family=Space+Grotesk:wght@400;500;700&amp;display=swap">
+<style>
+  body { margin: 0; background: #e9ecec; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; }
+  * { box-sizing: border-box; }
+  input, textarea { font-family: inherit; }
+  a { color: {{ T.accent }}; }
+  a:hover { color: #23a862; }
+  @keyframes sheetUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+  @keyframes tickDraw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+  @media (pointer: coarse) {
+    [data-phone="page"] { padding: 0 !important; min-height: 100vh !important; min-height: 100dvh !important; }
+    [data-phone="shell"] { width: 100% !important; max-width: 480px !important; height: 100vh !important; height: 100dvh !important; border-radius: 0 !important; border: none !important; box-shadow: none !important; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+    [data-phone="status"], [data-phone="home"] { display: none !important; }
+  }
+  @media (pointer: coarse) and (max-width: 480px) {
+    [data-phone="shell"] { padding-left: env(safe-area-inset-left, 0px); padding-right: env(safe-area-inset-right, 0px); }
+  }
+  [data-scroll]::-webkit-scrollbar { width: 0; height: 0; }
+  [data-scroll] { scrollbar-width: none; -ms-overflow-style: none; }
+</style>
+</helmet>
+<div data-phone="page" style="min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 24px 12px 30px; background: {{ T.pageBg }}; font-family: {{ T.font }};">
+  <div data-phone="shell" style="width: 390px; max-width: 100%; height: 844px; background: {{ T.shell }}; border-radius: {{ T.shellR }}; border: {{ T.shellBorder }}; overflow: hidden; position: relative; display: flex; flex-direction: column; box-shadow: {{ T.shellShadow }};">
+
+    <div data-phone="status" style="display: flex; align-items: center; justify-content: space-between; padding: 14px 30px 6px; font-size: 14px; font-weight: 600; color: {{ T.statusInk }}; letter-spacing: -0.01em; flex: none; background: {{ T.headBg }};">
+      <span>9:41</span>
+      <span style="display: flex; gap: 5px; align-items: center; color: {{ T.statusInk }};">
+        <span style="display: inline-block; width: 17px; height: 10px; border: 1.5px solid currentColor; border-radius: 3px; opacity: 0.9;"></span>
+      </span>
+    </div>
+
+    <div style="flex: none; display: flex; align-items: center; gap: 10px; padding: {{ T.headPad }}; background: {{ T.headBg }}; border-bottom: {{ T.headBorder }};">
+      <sc-if value="{{ canGoBack }}" hint-placeholder-val="{{ true }}">
+        <div onClick="{{ goBack }}" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; margin-left: -8px; cursor: pointer;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="{{ T.accent }}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"></path><path d="M11 6l-6 6 6 6"></path></svg>
+        </div>
+      </sc-if>
+      <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+        <div style="width: 36px; height: 44px;"></div>
+      </sc-if>
+      <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: {{ T.titleAlign }}; gap: 1px;">
+        <div style="font-family: {{ T.displayF }}; font-stretch: {{ T.wide }}; font-size: {{ T.titleS }}; font-weight: {{ T.titleW }}; color: {{ T.titleC }}; letter-spacing: {{ T.titleLS }}; text-transform: {{ T.titleTT }};">{{ title }}</div>
+        <sc-if value="{{ showTripSubtitle }}" hint-placeholder-val="{{ false }}">
+          <div style="font-size: 12.5px; color: {{ T.titleSub }};">{{ tripSubtitle }}</div>
+        </sc-if>
+      </div>
+      <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+        <div onClick="{{ openSettings }}" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; margin-right: -8px; cursor: pointer;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="{{ T.accent }}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h9M18.5 8H20M4 16h3.5M13 16h7"></path><circle cx="15.5" cy="8" r="2.4"></circle><circle cx="10" cy="16" r="2.4"></circle></svg>
+        </div>
+      </sc-if>
+      <sc-if value="{{ isTrip }}" hint-placeholder-val="{{ false }}">
+        <div style="display: flex; gap: 2px; margin-right: -8px;">
+          <div onClick="{{ openTripSheet }}" style="width: 40px; height: 44px; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="{{ T.accent }}"><circle cx="5" cy="12" r="1.9"></circle><circle cx="12" cy="12" r="1.9"></circle><circle cx="19" cy="12" r="1.9"></circle></svg>
+          </div>
+          <div onClick="{{ openAdd }}" style="width: 40px; height: 44px; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="{{ T.accent }}" stroke-width="1.7" stroke-linecap="{{ T.plusCap }}"><rect x="2.8" y="2.8" width="18.4" height="18.4" rx="{{ T.plusRx }}"></rect><path d="M12 8v8M8 12h8"></path></svg>
+          </div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ plainHeaderRight }}" hint-placeholder-val="{{ false }}">
+        <div style="width: 36px; height: 44px;"></div>
+      </sc-if>
+    </div>
+
+    <div style="flex: 1; overflow: hidden; display: flex; flex-direction: column; min-height: 0; position: relative;">
+    <sc-if value="{{ scrollThumbShow }}" hint-placeholder-val="{{ false }}">
+      <div style="position: absolute; right: 3px; width: 3px; border-radius: 2px; background: rgba(28,31,29,0.3); z-index: 3; pointer-events: none; top: {{ scrollThumbTop }}px; height: {{ scrollThumbH }}px;"></div>
+    </sc-if>
+    <div data-scroll="1" ref="{{ scrollRef }}" onScroll="{{ onScroll }}" style="flex: 1; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch;">
+
+      <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+        <div style="padding: 20px 20px 24px; display: flex; flex-direction: column; gap: 12px;">
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 2px;">
+            <div style="flex: 1; font-family: {{ T.labelF }}; font-stretch: {{ T.wide }}; font-size: {{ T.labelS }}; font-weight: {{ T.labelW }}; color: {{ T.labelC }}; letter-spacing: {{ T.labelLS }}; text-transform: uppercase;">{{ tripsLabel }}</div>
+            <div onClick="{{ startCreate }}" style="display: flex; align-items: center; gap: 6px; padding: {{ T.pillPad }}; border: {{ T.pillBorder }}; border-radius: {{ T.pillR }}; background: {{ T.pillBg }}; box-shadow: {{ T.pillShadow }}; color: {{ T.pillInk }}; font-size: 14.5px; font-weight: {{ T.pillW }}; text-transform: {{ T.pillTT }}; letter-spacing: {{ T.pillLS }}; cursor: pointer;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 6v12M6 12h12"></path></svg>
+              {{ L.newTrip }}
+            </div>
+          </div>
+          <sc-for list="{{ trips }}" as="t" hint-placeholder-count="2">
+            <div ref="{{ t.ref }}" style="border: {{ T.cardBorderW }} solid {{ t.border }}; border-radius: {{ T.cardR }}; padding: 16px 6px 16px 18px; display: flex; align-items: center; gap: 4px; background: {{ t.cardBg }}; position: relative; z-index: {{ t.z }}; box-shadow: {{ t.shadow }}; transition: transform 0.16s ease; transform: translateY({{ t.ty }}px);">
+              <div onClick="{{ t.open }}" style="flex: 1; display: flex; flex-direction: column; gap: 12px; cursor: pointer; min-width: 0;">
+                <div style="display: flex; align-items: flex-start; gap: 12px;">
+                  <div style="flex: 1; display: flex; flex-direction: column; gap: 5px; min-width: 0;">
+                    <div style="display: flex; align-items: center; gap: 7px; min-width: 0;">
+                      <sc-if value="{{ t.complete }}" hint-placeholder-val="{{ false }}">
+                        <svg width="19" height="19" viewBox="0 0 24 24" fill="{{ T.accent }}" style="flex: none;"><circle cx="12" cy="12" r="11"></circle><path d="M7.4 12.4l3 2.9 6-6.2" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                      </sc-if>
+                      <div style="font-family: {{ T.displayF }}; font-stretch: {{ T.wide }}; font-size: {{ T.cardTitleS }}; font-weight: {{ T.cardTitleW }}; color: {{ t.titleColor }}; letter-spacing: {{ T.cardTitleLS }}; text-transform: {{ T.cardTitleTT }};">{{ t.name }}</div>
+                    </div>
+                    <sc-if value="{{ showTripDates }}" hint-placeholder-val="{{ true }}">
+                      <div style="font-size: 13px; line-height: 18px; color: {{ T.sub }};">{{ t.meta }}</div>
+                    </sc-if>
+                    <sc-if value="{{ hideTripDates }}" hint-placeholder-val="{{ false }}">
+                      <div style="height: 18px;"></div>
+                    </sc-if>
+                  </div>
+                  <div style="font-size: 13px; font-weight: {{ t.countWeight }}; color: {{ t.countColor }}; padding-top: 4px; white-space: nowrap;">{{ t.countLabel }}</div>
+                </div>
+                <div style="height: {{ T.barH }}; border-radius: 999px; background: {{ T.barTrack }}; border: {{ T.barBorder }}; overflow: hidden;">
+                  <div style="height: 100%; background: {{ t.barColor }}; border-radius: 999px; width: {{ t.pct }}%;"></div>
+                </div>
+              </div>
+              <div onPointerDown="{{ t.dragStart }}" onPointerMove="{{ t.dragMove }}" onPointerUp="{{ t.dragEnd }}" onPointerCancel="{{ t.dragEnd }}" style="width: 40px; height: 56px; display: flex; align-items: center; justify-content: center; cursor: grab; touch-action: none; flex: none;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c7cdcb" stroke-width="2" stroke-linecap="round"><path d="M4 9h16M4 15h16"></path></svg>
+              </div>
+            </div>
+          </sc-for>
+          <sc-if value="{{ noTrips }}" hint-placeholder-val="{{ false }}">
+            <div style="border: 1px dashed #e2e6e5; border-radius: 18px; padding: 34px 20px; text-align: center; color: {{ T.sub }}; font-size: 14px; line-height: 1.5;">{{ L.noTrips }}</div>
+          </sc-if>
+
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isCreate }}" hint-placeholder-val="{{ false }}">
+        <div style="padding: 8px 20px 24px;">
+          <div style="display: flex; flex-direction: column;">
+            <div style="display: flex; align-items: center; gap: 16px; padding: 18px 0; border-bottom: {{ T.divStrong }};">
+              <div style="font-size: 15px; color: {{ T.sub }}; flex: none;">{{ L.tripName }}</div>
+              <input value="{{ draftName }}" onInput="{{ setName }}" placeholder="{{ L.tripNamePh }}" style="flex: 1; border: none; outline: none; text-align: right; font-size: 16px; color: {{ T.ink }}; background: transparent; min-width: 0;">
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px; padding: 18px 0; border-bottom: {{ T.divStrong }};">
+              <div style="font-size: 15px; color: {{ T.sub }}; flex: none;">{{ L.dates }}</div>
+              <div style="flex: 1; display: flex; align-items: center; justify-content: flex-end; gap: 6px; min-width: 0;">
+                <input type="date" value="{{ draftStart }}" onInput="{{ setStart }}" style="width: 108px; border: none; outline: none; text-align: right; font-size: 15px; color: {{ T.ink }}; background: transparent; min-width: 0;">
+                <div style="font-size: 15px; color: #c3c9c7; flex: none;">–</div>
+                <input type="date" value="{{ draftEnd }}" onInput="{{ setEnd }}" style="width: 108px; border: none; outline: none; text-align: right; font-size: 15px; color: {{ T.ink }}; background: transparent; min-width: 0;">
+              </div>
+            </div>
+            <sc-if value="{{ showDateNote }}" hint-placeholder-val="{{ false }}">
+              <div style="padding: 12px 0 0; font-size: 13px; color: #b3b9b7;">{{ draftDateNote }}</div>
+            </sc-if>
+          </div>
+
+          <sc-if value="{{ showTplPicker }}" hint-placeholder-val="{{ true }}">
+          <div style="font-size: 13px; color: {{ T.sub }}; letter-spacing: 0.02em; text-transform: uppercase; margin: 24px 0 10px;">{{ L.packingTemplate }}</div>
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <sc-for list="{{ templateCards }}" as="tpl" hint-placeholder-count="4">
+              <div onClick="{{ tpl.select }}" style="border: 1.5px solid {{ tpl.border }}; background: {{ tpl.bg }}; border-radius: 16px; padding: 14px 16px; display: flex; align-items: center; gap: 14px; cursor: pointer;">
+                <div style="flex: 1; display: flex; flex-direction: column; gap: 3px; min-width: 0;">
+                  <div style="font-size: 15.5px; font-weight: 600; color: {{ T.ink }}; letter-spacing: -0.01em;">{{ tpl.name }}</div>
+                  <div style="font-size: 13px; color: {{ T.sub }}; line-height: 1.4;">{{ tpl.detail }}</div>
+                </div>
+                <sc-if value="{{ tpl.selected }}" hint-placeholder-val="{{ false }}">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="{{ T.accent }}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"></circle><path d="M8 12.4l2.7 2.6L16 9.6"></path></svg>
+                </sc-if>
+              </div>
+            </sc-for>
+          </div>
+          </sc-if>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isTrip }}" hint-placeholder-val="{{ false }}">
+        <div style="padding-bottom: 24px;">
+          <sc-for list="{{ groups }}" as="g" hint-placeholder-count="4">
+            <div>
+              <div onClick="{{ g.toggle }}" style="background: {{ T.bandBg }}; padding: 13px 20px; display: flex; align-items: center; gap: 10px; cursor: pointer; border-top: {{ T.bandBorder }}; border-bottom: {{ T.bandBorder }};">
+                <div style="font-family: {{ T.labelF }}; font-stretch: {{ T.wide }}; font-size: {{ T.bandS }}; font-weight: {{ T.bandW }}; color: {{ T.bandC }}; letter-spacing: {{ T.bandLS }}; text-transform: {{ T.bandTT }};">{{ g.label }}</div>
+                <div style="font-size: 14px; color: {{ T.bandCount }};">{{ g.count }}</div>
+                <div style="flex: 1;"></div>
+                <sc-if value="{{ g.open }}" hint-placeholder-val="{{ true }}">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#b9bfbd" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"></path></svg>
+                </sc-if>
+                <sc-if value="{{ g.closed }}" hint-placeholder-val="{{ false }}">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#b9bfbd" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg>
+                </sc-if>
+              </div>
+              <sc-if value="{{ g.open }}" hint-placeholder-val="{{ true }}">
+                <div style="display: flex; flex-direction: column;">
+                  <sc-for list="{{ g.items }}" as="it" hint-placeholder-count="4">
+                    <div style="position: relative; overflow: hidden;">
+                      <sc-if value="{{ it.swiped }}" hint-placeholder-val="{{ false }}">
+                        <div style="position: absolute; top: 0; right: 0; bottom: 0; display: flex;">
+                          <div onClick="{{ it.edit }}" style="width: 88px; background: {{ T.editBg }}; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 15px; cursor: pointer;">{{ L.edit }}</div>
+                          <div onClick="{{ it.remove }}" style="width: 88px; background: {{ T.danger }}; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 15px; cursor: pointer;">{{ L.delete }}</div>
+                        </div>
+                      </sc-if>
+                      <div onClick="{{ it.toggle }}" onPointerDown="{{ it.down }}" onPointerMove="{{ it.move }}" style="position: relative; background: {{ T.rowBg }}; display: flex; align-items: center; gap: 14px; padding: 15px 20px; cursor: pointer; touch-action: pan-y; transition: transform 0.18s ease; transform: translateX({{ it.dx }}px);">
+                        <sc-if value="{{ it.doneRound }}" hint-placeholder-val="{{ false }}">
+                          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="{{ T.checkDone }}" stroke-width="{{ T.checkW }}" stroke-linecap="round" stroke-linejoin="round" style="flex: none;"><circle cx="12" cy="12" r="10.2"></circle><path d="M7.6 12.3l3 2.9 5.8-6" pathLength="1" style="stroke-dasharray: 1; animation: {{ it.tickAnim }};"></path></svg>
+                        </sc-if>
+                        <sc-if value="{{ it.undoneRound }}" hint-placeholder-val="{{ true }}">
+                          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="{{ T.checkIdle }}" stroke-width="{{ T.checkW }}" style="flex: none;"><circle cx="12" cy="12" r="10.2"></circle></svg>
+                        </sc-if>
+                        <sc-if value="{{ it.doneSquare }}" hint-placeholder-val="{{ false }}">
+                          <svg width="22" height="22" viewBox="0 0 24 24" fill="{{ T.accent }}" style="flex: none;"><rect x="1" y="1" width="22" height="22"></rect><path d="M6.4 12.4l3.4 3.3 7-7.4" fill="none" stroke="#fff" stroke-width="2.4" pathLength="1" style="stroke-dasharray: 1; animation: {{ it.tickAnim }};"></path></svg>
+                        </sc-if>
+                        <sc-if value="{{ it.undoneSquare }}" hint-placeholder-val="{{ false }}">
+                          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="{{ T.checkIdle }}" stroke-width="1.6" style="flex: none;"><rect x="1" y="1" width="22" height="22"></rect></svg>
+                        </sc-if>
+                        <div style="flex: 1; font-size: 16px; letter-spacing: -0.01em; color: {{ it.color }}; text-decoration: {{ it.deco }}; animation: {{ it.strikeAnim }};">{{ it.name }}</div>
+                        <div style="position: absolute; left: 20px; right: 0; bottom: 0; height: {{ T.divH }}; background: {{ T.div }};"></div>
+                      </div>
+                    </div>
+                  </sc-for>
+                  <sc-if value="{{ g.empty }}" hint-placeholder-val="{{ false }}">
+                    <div style="padding: 18px 20px; font-size: 14px; color: #b3b9b7;">{{ L.allPacked }}</div>
+                  </sc-if>
+                </div>
+              </sc-if>
+            </div>
+          </sc-for>
+          
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isAdd }}" hint-placeholder-val="{{ false }}">
+        <div style="padding: 8px 20px 24px;">
+          <div style="display: flex; align-items: center; gap: 16px; padding: 18px 0; border-bottom: {{ T.divStrong }};">
+            <div style="font-size: 15px; color: {{ T.sub }}; flex: none;">{{ L.item }}</div>
+            <input value="{{ newItemName }}" onInput="{{ setNewItem }}" placeholder="{{ L.required }}" style="flex: 1; border: none; outline: none; text-align: right; font-size: 16px; color: {{ T.ink }}; background: transparent; min-width: 0;">
+          </div>
+          <div style="font-size: 13px; color: {{ T.sub }}; letter-spacing: 0.02em; text-transform: uppercase; margin: 26px 0 12px;">{{ L.category }}</div>
+          <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+            <sc-for list="{{ catChips }}" as="c" hint-placeholder-count="8">
+              <div onClick="{{ c.pick }}" style="padding: 10px 15px; border-radius: {{ T.chipR }}; border: {{ T.chipBorderW }} solid {{ c.border }}; background: {{ c.bg }}; color: {{ c.color }}; font-size: 14.5px; cursor: pointer;">{{ c.label }}</div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isTemplates }}" hint-placeholder-val="{{ false }}">
+        <div style="padding: 8px 0 24px;">
+          <sc-for list="{{ templateRows }}" as="tpl" hint-placeholder-count="4">
+            <div onClick="{{ tpl.edit }}" style="display: flex; align-items: center; gap: 14px; padding: 16px 20px; border-top: {{ T.divStrong }}; cursor: pointer;">
+              <div style="flex: 1; display: flex; flex-direction: column; gap: 3px; min-width: 0;">
+                <div style="font-size: 16px; color: {{ T.ink }};">{{ tpl.name }}</div>
+                <div style="font-size: 13px; color: {{ T.sub }};">{{ tpl.sub }}</div>
+              </div>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c7cdcb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"></path></svg>
+            </div>
+          </sc-for>
+          
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isTplEdit }}" hint-placeholder-val="{{ false }}">
+        <div style="padding: 8px 0 24px;">
+          <div style="padding: 0 20px;">
+            <div style="display: flex; align-items: center; gap: 16px; padding: 18px 0; border-bottom: {{ T.divStrong }};">
+              <div style="font-size: 15px; color: {{ T.sub }}; flex: none;">{{ L.name }}</div>
+              <input value="{{ tplName }}" onInput="{{ setTplName }}" placeholder="{{ L.tplNamePh }}" style="flex: 1; border: none; outline: none; text-align: right; font-size: 16px; color: {{ T.ink }}; background: transparent; min-width: 0;">
+            </div>
+            <div style="display: flex; align-items: center; gap: 16px; padding: 18px 0; border-bottom: {{ T.divStrong }};">
+              <div style="font-size: 15px; color: {{ T.sub }}; flex: none;">{{ L.note }}</div>
+              <input value="{{ tplBlurb }}" onInput="{{ setTplBlurb }}" placeholder="{{ L.tplNotePh }}" style="flex: 1; border: none; outline: none; text-align: right; font-size: 16px; color: {{ T.ink }}; background: transparent; min-width: 0;">
+            </div>
+          </div>
+          <div style="padding: 22px 20px 6px; font-size: 13px; color: {{ T.sub }}; letter-spacing: 0.02em; text-transform: uppercase;">{{ tplCountLabel }}</div>
+          <sc-for list="{{ tplGroups }}" as="g" hint-placeholder-count="3">
+            <div>
+              <div style="background: {{ T.bandBg }}; padding: 11px 20px; font-family: {{ T.labelF }}; font-stretch: {{ T.wide }}; font-size: 14.5px; font-weight: {{ T.bandW }}; color: {{ T.bandC }}; letter-spacing: {{ T.bandLS }}; text-transform: {{ T.bandTT }}; border-top: {{ T.bandBorder }}; border-bottom: {{ T.bandBorder }};">{{ g.label }}</div>
+              <sc-for list="{{ g.items }}" as="it" hint-placeholder-count="3">
+                <div style="display: flex; align-items: center; gap: 12px; padding: 13px 20px; border-bottom: 1px solid #f2f4f3;">
+                  <div style="flex: 1; font-size: 16px; color: {{ T.ink }};">{{ it.name }}</div>
+                  <div onClick="{{ it.remove }}" style="width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#b9bfbd" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </sc-for>
+          <sc-if value="{{ tplEmpty }}" hint-placeholder-val="{{ false }}">
+            <div style="padding: 30px 20px; text-align: center; font-size: 14px; color: #b3b9b7;">{{ L.noItemsYet }}</div>
+          </sc-if>
+          <div style="margin-top: 26px;">
+            <div onClick="{{ duplicateTemplate }}" style="padding: 17px 20px; border-top: {{ T.divStrong }}; font-size: 16px; color: {{ T.ink }}; cursor: pointer;">{{ L.duplicateTemplate }}</div>
+            <div onClick="{{ exportTemplate }}" style="padding: 17px 20px; border-top: {{ T.divStrong }}; font-size: 16px; color: {{ T.ink }}; cursor: pointer;">{{ L.exportTemplate }}</div>
+            <div onClick="{{ deleteTemplate }}" style="padding: 17px 20px; border-top: {{ T.divStrong }}; border-bottom: {{ T.divStrong }}; font-size: 16px; color: {{ T.danger }}; cursor: pointer;">{{ L.deleteTemplate }}</div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isTplItem }}" hint-placeholder-val="{{ false }}">
+        <div style="padding: 8px 20px 24px;">
+          <div style="display: flex; align-items: center; gap: 16px; padding: 18px 0; border-bottom: {{ T.divStrong }};">
+            <div style="font-size: 15px; color: {{ T.sub }}; flex: none;">{{ L.item }}</div>
+            <input value="{{ tplItemName }}" onInput="{{ setTplItemName }}" placeholder="{{ L.required }}" style="flex: 1; border: none; outline: none; text-align: right; font-size: 16px; color: {{ T.ink }}; background: transparent; min-width: 0;">
+          </div>
+          <div style="font-size: 13px; color: {{ T.sub }}; letter-spacing: 0.02em; text-transform: uppercase; margin: 26px 0 12px;">{{ L.category }}</div>
+          <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+            <sc-for list="{{ tplCatChips }}" as="c" hint-placeholder-count="8">
+              <div onClick="{{ c.pick }}" style="padding: 10px 15px; border-radius: {{ T.chipR }}; border: {{ T.chipBorderW }} solid {{ c.border }}; background: {{ c.bg }}; color: {{ c.color }}; font-size: 14.5px; cursor: pointer;">{{ c.label }}</div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isLanguage }}" hint-placeholder-val="{{ false }}">
+        <div style="padding: 8px 0 24px;">
+          <sc-for list="{{ langRows }}" as="r" hint-placeholder-count="4">
+            <div onClick="{{ r.pick }}" style="display: flex; align-items: center; gap: 12px; padding: 17px 20px; border-top: {{ T.divStrong }}; cursor: pointer;">
+              <div style="flex: 1; font-size: 16px; color: {{ T.ink }};">{{ r.label }}</div>
+              <div style="font-size: 14px; color: {{ T.sub }};">{{ r.hint }}</div>
+              <sc-if value="{{ r.selected }}" hint-placeholder-val="{{ false }}">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="{{ T.accent }}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isStyle }}" hint-placeholder-val="{{ false }}">
+        <div style="padding: 8px 0 24px;">
+          <sc-for list="{{ styleRows }}" as="r" hint-placeholder-count="5">
+            <div onClick="{{ r.pick }}" style="display: flex; align-items: center; gap: 12px; padding: 17px 20px; border-top: {{ T.divStrong }}; cursor: pointer;">
+              <div style="flex: 1; font-size: 16px; color: {{ T.ink }};">{{ r.label }}</div>
+              <sc-if value="{{ r.selected }}" hint-placeholder-val="{{ false }}">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="{{ T.accent }}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isSettings }}" hint-placeholder-val="{{ false }}">
+        <div style="padding: 8px 0 24px;">
+          <div style="font-size: 13px; color: {{ T.sub }}; letter-spacing: 0.02em; text-transform: uppercase; padding: 18px 20px 8px;">{{ L.general }}</div>
+          <div onClick="{{ openLanguage }}" style="display: flex; align-items: center; gap: 12px; padding: 17px 20px; border-top: {{ T.divStrong }}; border-bottom: {{ T.divStrong }}; cursor: pointer;">
+            <div style="flex: 1; font-size: 16px; color: {{ T.ink }};">{{ L.language }}</div>
+            <div style="font-size: 15px; color: {{ T.sub }};">{{ langValue }}</div>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c7cdcb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"></path></svg>
+          </div>
+          <div onClick="{{ openStyle }}" style="display: flex; align-items: center; gap: 12px; padding: 17px 20px; border-bottom: {{ T.divStrong }}; cursor: pointer;">
+            <div style="flex: 1; font-size: 16px; color: {{ T.ink }};">{{ L.style }}</div>
+            <div style="font-size: 15px; color: {{ T.sub }};">{{ styleValue }}</div>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c7cdcb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"></path></svg>
+          </div>
+
+          <div style="font-size: 13px; color: {{ T.sub }}; letter-spacing: 0.02em; text-transform: uppercase; padding: 28px 20px 8px;">{{ L.listBehaviour }}</div>
+          <div onClick="{{ toggleDefaultUnpacked }}" style="display: flex; align-items: center; gap: 14px; padding: 16px 20px; border-top: {{ T.divStrong }}; cursor: pointer;">
+            <div style="flex: 1; font-size: 16px; color: {{ T.ink }};">{{ L.hidePackedDefault }}</div>
+            <div style="width: 50px; height: 30px; border-radius: {{ T.toggleR }}; background: {{ s1bg }}; padding: 3px; flex: none; transition: background 0.2s;">
+              <div style="width: 24px; height: 24px; border-radius: {{ T.knobR }}; background: #fff; box-shadow: {{ T.knobShadow }}; transition: transform 0.2s; transform: translateX({{ s1x }}px);"></div>
+            </div>
+          </div>
+          <div onClick="{{ toggleAutoCollapse }}" style="display: flex; align-items: center; gap: 14px; padding: 16px 20px; border-top: {{ T.divStrong }}; cursor: pointer;">
+            <div style="flex: 1; font-size: 16px; color: {{ T.ink }};">{{ L.collapseWhenDone }}</div>
+            <div style="width: 50px; height: 30px; border-radius: {{ T.toggleR }}; background: {{ s2bg }}; padding: 3px; flex: none; transition: background 0.2s;">
+              <div style="width: 24px; height: 24px; border-radius: {{ T.knobR }}; background: #fff; box-shadow: {{ T.knobShadow }}; transition: transform 0.2s; transform: translateX({{ s2x }}px);"></div>
+            </div>
+          </div>
+
+          <div style="font-size: 13px; color: {{ T.sub }}; letter-spacing: 0.02em; text-transform: uppercase; padding: 28px 20px 8px;">{{ L.templates }}</div>
+          <div onClick="{{ openTemplates }}" style="display: flex; align-items: center; gap: 12px; padding: 17px 20px; border-top: {{ T.divStrong }}; cursor: pointer;">
+            <div style="flex: 1; font-size: 16px; color: {{ T.ink }};">{{ L.manageTemplates }}</div>
+            <div style="font-size: 15px; color: {{ T.sub }};">{{ templateCount }}</div>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c7cdcb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"></path></svg>
+          </div>
+          <div onClick="{{ openImport }}" style="padding: 17px 20px; border-top: {{ T.divStrong }}; border-bottom: {{ T.divStrong }}; font-size: 16px; color: {{ T.ink }}; cursor: pointer;">{{ L.importTemplate }}</div>
+
+          <div style="font-size: 13px; color: {{ T.sub }}; letter-spacing: 0.02em; text-transform: uppercase; padding: 28px 20px 8px;">{{ L.data }}</div>
+          <div onClick="{{ exportAllTrips }}" style="padding: 17px 20px; border-top: {{ T.divStrong }}; font-size: 16px; color: {{ T.ink }}; cursor: pointer;">{{ L.exportAllTrips }}</div>
+          <div onClick="{{ askResetAll }}" style="padding: 17px 20px; border-top: {{ T.divStrong }}; font-size: 16px; color: {{ T.ink }}; cursor: pointer;">{{ L.resetAllChecks }}</div>
+          
+          
+        </div>
+      </sc-if>
+
+    </div>
+    </div>
+
+    <sc-if value="{{ isTrip }}" hint-placeholder-val="{{ false }}">
+      <div style="flex: none; border-top: {{ T.footBorder }}; background: {{ T.footBg }}; padding: 14px 20px; display: flex; align-items: center; gap: 14px;">
+        <div style="display: flex; align-items: baseline; gap: 4px;">
+          <div style="font-family: {{ T.displayF }}; font-stretch: {{ T.wide }}; font-size: 30px; font-weight: {{ T.counterW }}; color: {{ T.ink }}; letter-spacing: -0.03em;">{{ doneCount }}</div>
+          <div style="font-size: 15px; color: #a9afae;">/ {{ totalCount }}</div>
+        </div>
+        <div style="flex: 1;"></div>
+        <div style="font-size: 14.5px; color: #8d9493;">{{ L.hidePacked }}</div>
+        <div onClick="{{ toggleUnpacked }}" style="width: 50px; height: 30px; border-radius: {{ T.toggleR }}; background: {{ fbg }}; padding: 3px; flex: none; cursor: pointer; transition: background 0.2s;">
+          <div style="width: 24px; height: 24px; border-radius: {{ T.knobR }}; background: #fff; box-shadow: {{ T.knobShadow }}; transition: transform 0.2s; transform: translateX({{ fx }}px);"></div>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isCreate }}" hint-placeholder-val="{{ false }}">
+      <div style="flex: none; padding: 12px 20px 20px; background: {{ T.footBg }}; border-top: {{ T.footBorder }};">
+        <div onClick="{{ createTrip }}" style="height: 52px; border-radius: {{ T.btnR }}; background: {{ T.accent }}; border: {{ T.btnBorder }}; box-shadow: {{ T.btnShadow }}; color: {{ T.accentInk }}; font-family: {{ T.btnF }}; font-stretch: {{ T.wide }}; font-size: 16.5px; font-weight: {{ T.btnW }}; text-transform: {{ T.btnTT }}; letter-spacing: {{ T.btnLS }}; display: flex; align-items: center; justify-content: center; cursor: pointer; letter-spacing: -0.01em;">{{ createCta }}</div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isAdd }}" hint-placeholder-val="{{ false }}">
+      <div style="flex: none; padding: 12px 20px 20px; background: {{ T.footBg }}; border-top: {{ T.footBorder }};">
+        <div onClick="{{ addItem }}" style="height: 52px; border-radius: {{ T.btnR }}; background: {{ T.accent }}; border: {{ T.btnBorder }}; box-shadow: {{ T.btnShadow }}; color: {{ T.accentInk }}; font-family: {{ T.btnF }}; font-stretch: {{ T.wide }}; font-size: 16.5px; font-weight: {{ T.btnW }}; text-transform: {{ T.btnTT }}; letter-spacing: {{ T.btnLS }}; display: flex; align-items: center; justify-content: center; cursor: pointer;">{{ addCta }}</div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isTemplates }}" hint-placeholder-val="{{ false }}">
+      <div style="flex: none; padding: 12px 20px 20px; background: {{ T.footBg }}; border-top: {{ T.footBorder }}; display: flex; gap: 10px;">
+        <div onClick="{{ openImport }}" style="flex: 1; height: 52px; border-radius: {{ T.btnR }}; border: {{ T.btn2Border }}; box-shadow: {{ T.btn2Shadow }}; background: {{ T.btn2Bg }}; color: {{ T.ink }}; font-family: {{ T.btnF }}; font-stretch: {{ T.wide }}; font-size: 16.5px; font-weight: {{ T.btnW }}; text-transform: {{ T.btnTT }}; letter-spacing: {{ T.btnLS }}; display: flex; align-items: center; justify-content: center; cursor: pointer;">{{ L.importShort }}</div>
+        <div onClick="{{ newTemplate }}" style="flex: 1; height: 52px; border-radius: {{ T.btnR }}; background: {{ T.accent }}; border: {{ T.btnBorder }}; box-shadow: {{ T.btnShadow }}; color: {{ T.accentInk }}; font-family: {{ T.btnF }}; font-stretch: {{ T.wide }}; font-size: 16.5px; font-weight: {{ T.btnW }}; text-transform: {{ T.btnTT }}; letter-spacing: {{ T.btnLS }}; display: flex; align-items: center; justify-content: center; cursor: pointer;">{{ L.newTemplate }}</div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isTplEdit }}" hint-placeholder-val="{{ false }}">
+      <div style="flex: none; padding: 12px 20px 20px; background: {{ T.footBg }}; border-top: {{ T.footBorder }}; display: flex; gap: 10px;">
+        <div onClick="{{ openTplItem }}" style="flex: 1; height: 52px; border-radius: {{ T.btnR }}; border: {{ T.btn2Border }}; box-shadow: {{ T.btn2Shadow }}; background: {{ T.btn2Bg }}; color: {{ T.ink }}; font-family: {{ T.btnF }}; font-stretch: {{ T.wide }}; font-size: 16.5px; font-weight: {{ T.btnW }}; text-transform: {{ T.btnTT }}; letter-spacing: {{ T.btnLS }}; display: flex; align-items: center; justify-content: center; cursor: pointer;">{{ L.addItem }}</div>
+        <div onClick="{{ doneTemplate }}" style="flex: 1; height: 52px; border-radius: {{ T.btnR }}; background: {{ T.accent }}; border: {{ T.btnBorder }}; box-shadow: {{ T.btnShadow }}; color: {{ T.accentInk }}; font-family: {{ T.btnF }}; font-stretch: {{ T.wide }}; font-size: 16.5px; font-weight: {{ T.btnW }}; text-transform: {{ T.btnTT }}; letter-spacing: {{ T.btnLS }}; display: flex; align-items: center; justify-content: center; cursor: pointer;">{{ L.done }}</div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isTplItem }}" hint-placeholder-val="{{ false }}">
+      <div style="flex: none; padding: 12px 20px 20px; background: {{ T.footBg }}; border-top: {{ T.footBorder }};">
+        <div onClick="{{ addTplItem }}" style="height: 52px; border-radius: {{ T.btnR }}; background: {{ T.accent }}; border: {{ T.btnBorder }}; box-shadow: {{ T.btnShadow }}; color: {{ T.accentInk }}; font-family: {{ T.btnF }}; font-stretch: {{ T.wide }}; font-size: 16.5px; font-weight: {{ T.btnW }}; text-transform: {{ T.btnTT }}; letter-spacing: {{ T.btnLS }}; display: flex; align-items: center; justify-content: center; cursor: pointer;">{{ L.addToTemplate }}</div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ sheetOpen }}" hint-placeholder-val="{{ false }}">
+      <div onClick="{{ closeSheet }}" style="position: absolute; inset: 0; background: rgba(22,28,26,0.32); display: flex; flex-direction: column; justify-content: flex-end;">
+        <div style="background: {{ T.sheetBg }}; border-top: {{ T.sheetBorder }}; border-radius: {{ T.sheetR }}; padding: 8px 0 14px; animation: sheetUp 0.22s ease;">
+          <div style="text-align: center; font-size: 13px; color: {{ T.sub }}; padding: 14px 20px 10px;">{{ sheetTitle }}</div>
+          <sc-for list="{{ sheetActions }}" as="a" hint-placeholder-count="3">
+            <div onClick="{{ a.run }}" style="padding: 17px 20px; text-align: center; font-size: 17px; border-top: 1px solid #f2f4f3; color: {{ a.color }}; cursor: pointer;">{{ a.label }}</div>
+          </sc-for>
+          <div style="height: 8px; background: #f7f8f8; margin: 8px 0 0;"></div>
+          <div onClick="{{ closeSheet }}" style="padding: 17px 20px; text-align: center; font-size: 17px; color: #8d9493; cursor: pointer;">{{ L.cancel }}</div>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ modalOpen }}" hint-placeholder-val="{{ false }}">
+      <div style="position: absolute; inset: 0; background: rgba(22,28,26,0.32); display: flex; flex-direction: column; justify-content: flex-end;">
+        <div style="background: {{ T.sheetBg }}; border-top: {{ T.sheetBorder }}; border-radius: {{ T.sheetR }}; padding: 20px 20px 22px; animation: sheetUp 0.22s ease; display: flex; flex-direction: column; gap: 10px;">
+          <div style="font-size: 17px; font-weight: 600; color: {{ T.ink }};">{{ modalTitle }}</div>
+          <div style="font-size: 13px; color: {{ T.sub }}; line-height: 1.45;">{{ modalHint }}</div>
+          <textarea value="{{ modalText }}" onChange="{{ setModalText }}" style="height: 230px; border: 1px solid #e6eae8; border-radius: 14px; padding: 12px; font-family: ui-monospace, Menlo, monospace; font-size: 13px; line-height: 1.55; color: {{ T.ink }}; outline: none; resize: none;"></textarea>
+          <div style="display: flex; gap: 10px;">
+            <div onClick="{{ closeModal }}" style="flex: 1; height: 50px; border-radius: 16px; border: 1.5px solid #dfe4e2; color: {{ T.ink }}; font-size: 16px; font-weight: 600; display: flex; align-items: center; justify-content: center; cursor: pointer;">{{ L.close }}</div>
+            <div onClick="{{ modalAction }}" style="flex: 1; height: 50px; border-radius: 16px; background: {{ T.accent }}; color: #fff; font-size: 16px; font-weight: 600; display: flex; align-items: center; justify-content: center; cursor: pointer;">{{ modalCta }}</div>
+          </div>
+          <sc-if value="{{ isExportModal }}" hint-placeholder-val="{{ false }}">
+            <div onClick="{{ downloadMd }}" style="text-align: center; font-size: 14.5px; color: {{ T.accent }}; cursor: pointer; padding: 4px;">{{ L.downloadMd }}</div>
+          </sc-if>
+        </div>
+      </div>
+    </sc-if>
+
+    <div data-phone="home" style="position: absolute; bottom: 8px; left: 50%; width: 134px; height: 5px; border-radius: 3px; background: {{ T.ink }}; margin-left: -67px; opacity: 0.85;"></div>
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:430,&quot;height&quot;:900},&quot;uiStyle&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;clean&quot;,&quot;maximalism&quot;,&quot;swiss&quot;,&quot;sbb&quot;,&quot;brutalism&quot;],&quot;default&quot;:&quot;clean&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Style&quot;},&quot;tickAnimation&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Style&quot;},&quot;showTripDates&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Behaviour&quot;},&quot;hidePackedByDefault&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Behaviour&quot;},&quot;autoCollapseDone&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Behaviour&quot;},&quot;completedStyle&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;fade&quot;,&quot;strikethrough&quot;],&quot;default&quot;:&quot;strikethrough&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Behaviour&quot;}}">
+const CATS = [
+  { key: 'pretrip', en: 'Pre-trip tasks', zh: '行前事项', fr: 'Avant le départ' },
+  { key: 'docs', en: 'Documents & copies', zh: '文件/备份', fr: 'Documents & copies' },
+  { key: 'money', en: 'Money', zh: '资金', fr: 'Argent' },
+  { key: 'clothing', en: 'Clothing', zh: '服装', fr: 'Vêtements' },
+  { key: 'swim', en: 'Swimming', zh: '游泳', fr: 'Natation' },
+  { key: 'toiletries', en: 'Toiletries', zh: '个护/化妆', fr: 'Trousse de toilette' },
+  { key: 'health', en: 'Health & meds', zh: '医疗/健康', fr: 'Santé & médicaments' },
+  { key: 'tech', en: 'Electronics', zh: '电子/数码', fr: 'Électronique' },
+  { key: 'snow', en: 'Ski & snow gear', zh: '滑雪装备', fr: 'Matériel de ski' },
+  { key: 'misc', en: 'Other', zh: '杂项', fr: 'Divers' },
+  { key: 'notes', en: 'Travel notes', zh: '旅途备忘', fr: 'Notes de voyage' }
+];
+
+const STR = {
+  en: {
+    packingLists: 'Packing lists', newTrip: 'New trip', createTrip: 'Create trip', tripName: 'Trip name', tripNamePh: 'Hokkaido ski week',
+    dates: 'Dates', style: 'Style', packingTemplate: 'Packing template',
+    startFromTemplate: 'Start from a template', manage: 'Manage', noTrips: 'No trips yet. Start one from a template below.',
+    item: 'Item', category: 'Category', required: 'Required', addItem: 'Add item', editItem: 'Edit item', addToList: 'Add to list', saveChanges: 'Save changes',
+    edit: 'Edit', delete: 'Delete', done: 'Done', cancel: 'Cancel', close: 'Close', trip: 'Trip',
+    hidePacked: 'Hide packed', allPacked: 'All packed', swipeHint: 'Swipe a row left to edit or delete', packed: 'packed', packedBadge: 'All packed', items: 'items',
+    settings: 'Settings', general: 'General', language: 'Language', systemLang: 'Follow system', listBehaviour: 'List behavior',
+    hidePackedDefault: 'Hide packed items by default', collapseWhenDone: 'Collapse a category when finished',
+    templates: 'Templates', manageTemplates: 'Manage templates', newTemplate: 'New template', importShort: 'Import',
+    importTemplate: 'Import a template', exportTemplate: 'Export as text', duplicateTemplate: 'Duplicate template', deleteTemplate: 'Delete template',
+    editTemplate: 'Edit template', name: 'Name', note: 'Note', tplNamePh: 'Weekend hiking', tplNotePh: 'Two nights, small pack',
+    addToTemplate: 'Add to template', noItemsYet: 'No items yet — add the first one below.',
+    templatesNote: 'Edits apply to new trips only — existing lists keep what they already have.',
+    data: 'Data', exportAllTrips: 'Export all trips', exportAllTitle: 'Export all trips', resetAllChecks: 'Reset checkmarks on every trip', deleteAllTrips: 'Delete all trips',
+    savedNote: 'Every change is saved on this device automatically.',
+    resetChecks: 'Reset all checkmarks', markAllPacked: 'Mark everything packed', expandAll: 'Expand all categories',
+    editTrip: 'Edit', saveAsTemplate: 'Save trip as a template', deleteTrip: 'Delete this trip',
+    exportTitle: 'Export template', exportHint: 'Plain Markdown — copy it or download a .md file.', copy: 'Copy', copied: 'Copied',
+    importTitle: 'Import template', importHint: 'Paste a list: “# Name”, “## Category”, then one item per line.', importCta: 'Import', downloadMd: 'Download .md file'
+  },
+  zh: {
+    packingLists: '行程清单', newTrip: '新建行程', createTrip: '创建行程', tripName: '行程名称', tripNamePh: '北海道滑雪周',
+    dates: '日期', style: '风格', packingTemplate: '清单模板',
+    startFromTemplate: '从模板开始', manage: '管理', noTrips: '还没有行程，先从下面的模板开始。',
+    item: '名称', category: '类别', required: '请填写', addItem: '添加物品', editItem: '编辑物品', addToList: '添加到清单', saveChanges: '保存修改',
+    edit: '编辑', delete: '删除', done: '完成', cancel: '取消', close: '关闭', trip: '行程',
+    hidePacked: '仅看未完成', allPacked: '已全部收拾', swipeHint: '向左滑动可编辑或删除', packed: '已完成', packedBadge: '已全部完成', items: '项',
+    settings: '设置', general: '通用', language: '语言', systemLang: '跟随系统', listBehaviour: '清单设置',
+    hidePackedDefault: '默认隐藏已完成', collapseWhenDone: '完成后自动折叠类别',
+    templates: '模板', manageTemplates: '管理模板', newTemplate: '新建模板', importShort: '导入',
+    importTemplate: '导入模板', exportTemplate: '导出为文本', duplicateTemplate: '复制模板', deleteTemplate: '删除模板',
+    editTemplate: '编辑模板', name: '名称', note: '备注', tplNamePh: '周末徒步', tplNotePh: '两晚，轻装',
+    addToTemplate: '添加到模板', noItemsYet: '还没有内容，先添加第一项。',
+    templatesNote: '修改只对新建行程生效，已有清单保持不变。',
+    data: '数据', exportAllTrips: '导出所有行程', exportAllTitle: '导出所有行程', resetAllChecks: '清空所有行程的勾选', deleteAllTrips: '删除所有行程',
+    savedNote: '所有修改会自动保存在本机。',
+    resetChecks: '清空全部勾选', markAllPacked: '全部标记完成', expandAll: '展开所有类别',
+    editTrip: '编辑', saveAsTemplate: '存为模板', deleteTrip: '删除此行程',
+    exportTitle: '导出模板', exportHint: '纯 Markdown 文本，可复制或下载 .md 文件。', copy: '复制', copied: '已复制',
+    importTitle: '导入模板', importHint: '粘贴清单：“# 名称”“## 类别”，之后每行一项。', importCta: '导入', downloadMd: '下载 .md 文件'
+  },
+  fr: {
+    packingLists: 'Listes de voyage', newTrip: 'Nouveau voyage', createTrip: 'Créer le voyage', tripName: 'Nom du voyage', tripNamePh: 'Semaine de ski',
+    dates: 'Dates', style: 'Apparence', packingTemplate: 'Modèle de valise',
+    startFromTemplate: 'Partir d’un modèle', manage: 'Gérer', noTrips: 'Aucun voyage. Commencez avec un modèle ci-dessous.',
+    item: 'Article', category: 'Catégorie', required: 'Obligatoire', addItem: 'Ajouter', editItem: 'Modifier l’article', addToList: 'Ajouter à la liste', saveChanges: 'Enregistrer',
+    edit: 'Modifier', delete: 'Supprimer', done: 'Terminé', cancel: 'Annuler', close: 'Fermer', trip: 'Voyage',
+    hidePacked: 'Masquer les cochés', allPacked: 'Tout est prêt', swipeHint: 'Glissez vers la gauche pour modifier ou supprimer', packed: 'prêts', packedBadge: 'Tout est prêt', items: 'articles',
+    settings: 'Réglages', general: 'Général', language: 'Langue', systemLang: 'Suivre le système', listBehaviour: 'Comportement des listes',
+    hidePackedDefault: 'Masquer les articles prêts par défaut', collapseWhenDone: 'Replier une catégorie terminée',
+    templates: 'Modèles', manageTemplates: 'Gérer les modèles', newTemplate: 'Nouveau modèle', importShort: 'Importer',
+    importTemplate: 'Importer un modèle', exportTemplate: 'Exporter en texte', duplicateTemplate: 'Dupliquer le modèle', deleteTemplate: 'Supprimer le modèle',
+    editTemplate: 'Modifier le modèle', name: 'Nom', note: 'Note', tplNamePh: 'Randonnée week-end', tplNotePh: 'Deux nuits, sac léger',
+    addToTemplate: 'Ajouter au modèle', noItemsYet: 'Aucun article — ajoutez le premier ci-dessous.',
+    templatesNote: 'Les modifications ne concernent que les nouveaux voyages.',
+    data: 'Données', exportAllTrips: 'Exporter tous les voyages', exportAllTitle: 'Exporter tous les voyages', resetAllChecks: 'Tout décocher dans tous les voyages', deleteAllTrips: 'Supprimer tous les voyages',
+    savedNote: 'Chaque modification est enregistrée sur cet appareil.',
+    resetChecks: 'Décocher tout', markAllPacked: 'Tout cocher', expandAll: 'Déplier les catégories',
+    editTrip: 'Modifier', saveAsTemplate: 'Enregistrer comme modèle', deleteTrip: 'Supprimer ce voyage',
+    exportTitle: 'Exporter le modèle', exportHint: 'Markdown simple — copiez-le ou téléchargez un .md.', copy: 'Copier', copied: 'Copié',
+    importTitle: 'Importer un modèle', importHint: 'Collez une liste : « # Nom », « ## Catégorie », puis un article par ligne.', importCta: 'Importer', downloadMd: 'Télécharger le .md'
+  }
+};
+
+const STYLES = [
+  { id: 'clean', key: 'clean', names: { en: 'Clean', zh: '简洁', fr: 'Épuré' } },
+  { id: 'maximalism', key: 'max', names: { en: 'Maximal', zh: '浓烈', fr: 'Maximaliste' } },
+  { id: 'swiss', key: 'swiss', names: { en: 'Swiss', zh: '瑞士风', fr: 'Suisse' } },
+  { id: 'sbb', key: 'rail', names: { en: 'SBB', zh: 'SBB 风', fr: 'SBB' } },
+  { id: 'brutalism', key: 'brutal', names: { en: 'Brutalist', zh: '粗野风', fr: 'Brutaliste' } }
+];
+function validStyle(id) { return STYLES.some(s => s.id === id) ? id : null; }
+
+const LOCALE = { en: 'en-US', zh: 'zh-CN', fr: 'fr-FR' };
+
+const DEFAULTS_VERSION = 6;
+
+const DEFAULT_TEMPLATES = [
+  {
+    builtin: true, id: "short", tag: "3d", name: "3天短途", blurb: "",
+    lists: {
+      pretrip: ["买机票", "订酒店", "分享行程给家人/朋友", "锁好贵重物品"],
+      docs: ["护照/驾照", "行程单", "酒店预订单"],
+      money: ["现金", "信用卡"],
+      clothing: ["外套", "长袖衬衫", "内衣裤", "袜子", "运动鞋", "拖鞋", "耳塞/眼罩", "雨伞/雨衣", "水壶"],
+      toiletries: ["洗发水", "沐浴露", "牙膏牙刷", "毛巾", "指甲刀", "梳子", "护肤品", "防晒", "剃须刀"],
+      health: ["Minoxidil", "Finasteride", "创可贴", "避孕套", "维生素"],
+      tech: ["电脑", "手表", "手机x2", "耳机", "电源转换器", "电脑充电器", "手表充电器", "移动电源", "当地eSIM"]
+    }
+  },
+  {
+    builtin: true, id: "long", tag: "1m", name: "1月长途", blurb: "",
+    lists: {
+      pretrip: ["买机票", "订酒店", "换钱", "分享行程给朋友", "锁好贵重物品", "重要文件备份"],
+      docs: ["护照", "签证及复印件", "行程单", "酒店预订单", "身份证", "驾照（国际驾照）", "H1B visa", "I-797", "旅行保险"],
+      money: ["现金", "信用卡"],
+      clothing: ["外套", "长袖衬衫", "内衣裤", "袜子", "运动鞋", "拖鞋", "帽子", "耳塞/眼罩", "雨伞/雨衣", "水壶"],
+      toiletries: ["洗发水", "沐浴露", "牙膏牙刷", "毛巾", "指甲刀", "棉签", "梳子", "护肤品", "防晒", "剃须刀"],
+      health: ["Minoxidil", "Finasteride", "止疼药", "感冒药", "创可贴", "避孕套", "防虫驱蚊", "维生素", "蛋白粉", "当地紧急电话"],
+      tech: ["电脑", "手表", "手机x2", "耳机", "电源转换器", "电脑充电器", "手表充电器", "移动电源", "当地eSIM"],
+      misc: ["拜访朋友礼物"]
+    }
+  },
+  {
+    builtin: true, id: "ski", tag: "⛷", name: "滑雪之行", blurb: "",
+    lists: {
+      pretrip: ["买机票", "订酒店", "换钱", "分享行程给朋友", "锁好贵重物品", "订雪票"],
+      docs: ["护照/驾照", "签证及复印件", "行程单", "酒店预订单", "身份证"],
+      money: ["现金", "信用卡"],
+      clothing: ["外套", "长袖衬衫", "内衣裤", "袜子", "运动鞋", "拖鞋", "帽子", "耳塞/眼罩", "雨伞/雨衣"],
+      toiletries: ["洗发水", "沐浴露", "牙膏牙刷", "毛巾", "指甲刀", "棉签", "梳子", "护肤品", "防晒", "剃须刀"],
+      health: ["Minoxidil", "Finasteride", "止疼药", "感冒药", "创可贴", "避孕套", "防虫驱蚊", "维生素", "蛋白粉", "当地紧急电话"],
+      tech: ["电脑", "手表", "goPro", "手机", "电源转换器", "电脑充电器", "手表充电器", "移动电源"],
+      snow: ["滑雪服", "滑雪裤", "保暖内衣裤", "手套", "护目镜", "头盔", "面罩", "滑雪袜", "雪鞋", "泳裤", "折叠水壶"]
+    }
+  },
+  {
+    builtin: true, id: "eu", tag: "EU", name: "欧洲之行", blurb: "",
+    lists: {
+      pretrip: ["买机票", "订酒店", "换钱", "分享行程给朋友", "锁好贵重物品"],
+      docs: ["护照", "签证及复印件", "行程单", "酒店预订单", "身份证", "驾照（国际驾照）", "H1B visa", "I-797", "Schengen签证", "Schengen旅行保险"],
+      money: ["现金", "信用卡"],
+      clothing: ["外套", "长袖衬衫", "内衣裤", "袜子", "运动鞋", "拖鞋", "帽子", "耳塞/眼罩", "雨伞/雨衣", "水壶"],
+      swim: ["游泳裤", "游泳帽", "游泳眼镜", "游泳耳塞"],
+      toiletries: ["洗发水", "沐浴露", "牙膏牙刷", "毛巾", "指甲刀", "棉签", "梳子", "护肤品", "防晒", "剃须刀"],
+      health: ["Minoxidil", "Finasteride", "止疼药", "感冒药", "创可贴", "避孕套", "防虫驱蚊", "维生素", "蛋白粉", "当地紧急电话"],
+      tech: ["电脑", "手表", "手机x2", "耳机", "电源转换器", "电脑充电器", "手表充电器", "移动电源", "当地eSIM"],
+      misc: ["拜访朋友礼物"]
+    }
+  },
+  { builtin: true, id: 'blank', tag: '＋', name: 'Blank list', blurb: '', lists: {} }
+];
+
+const TPL_EN = {
+  "买机票": "Book flights",
+  "订酒店": "Book hotel",
+  "换钱": "Exchange money",
+  "分享行程给朋友": "Share itinerary with friends",
+  "分享行程给家人/朋友": "Share itinerary with family/friends",
+  "锁好贵重物品": "Lock up valuables",
+  "重要文件备份": "Back up important documents",
+  "订雪票": "Buy lift tickets",
+  "护照": "Passport",
+  "护照/驾照": "Passport / driver’s license",
+  "签证及复印件": "Visa + photocopies",
+  "行程单": "Itinerary",
+  "酒店预订单": "Hotel confirmations",
+  "身份证": "ID card",
+  "驾照（国际驾照）": "Driver’s license + International Driving Permit",
+  "旅行保险": "Travel insurance",
+  "Schengen签证": "Schengen visa",
+  "Schengen旅行保险": "Schengen travel insurance",
+  "现金": "Cash",
+  "信用卡": "Credit cards",
+  "外套": "Jacket",
+  "长袖衬衫": "Long-sleeve shirts",
+  "内衣裤": "Underwear",
+  "袜子": "Socks",
+  "运动鞋": "Sneakers",
+  "拖鞋": "Slippers / flip-flops",
+  "帽子": "Hat",
+  "耳塞/眼罩": "Earplugs / eye mask",
+  "雨伞/雨衣": "Umbrella / rain jacket",
+  "水壶": "Water bottle",
+  "游泳裤": "Swim trunks",
+  "游泳帽": "Swim cap",
+  "游泳眼镜": "Swim goggles",
+  "游泳耳塞": "Swim earplugs",
+  "洗发水": "Shampoo",
+  "沐浴露": "Body wash",
+  "牙膏牙刷": "Toothbrush & toothpaste",
+  "毛巾": "Towel",
+  "指甲刀": "Nail clippers",
+  "棉签": "Cotton swabs",
+  "梳子": "Comb",
+  "护肤品": "Skincare",
+  "防晒": "Sunscreen",
+  "剃须刀": "Razor",
+  "止疼药": "Pain relievers",
+  "感冒药": "Cold medicine",
+  "创可贴": "Band-Aids",
+  "避孕套": "Condoms",
+  "防虫驱蚊": "Insect repellent",
+  "维生素": "Vitamins",
+  "蛋白粉": "Protein powder",
+  "当地紧急电话": "Local emergency numbers",
+  "电脑": "Laptop",
+  "手表": "Watch",
+  "手机x2": "Phones (x2)",
+  "手机": "Phone",
+  "耳机": "Headphones",
+  "电源转换器": "Plug adapter",
+  "电脑充电器": "Laptop charger",
+  "手表充电器": "Watch charger",
+  "移动电源": "Portable charger",
+  "当地eSIM": "Local eSIM",
+  "滑雪服": "Ski jacket",
+  "滑雪裤": "Ski pants",
+  "保暖内衣裤": "Thermal base layers",
+  "手套": "Gloves",
+  "护目镜": "Goggles",
+  "头盔": "Helmet",
+  "面罩": "Neck gaiter / face mask",
+  "滑雪袜": "Ski socks",
+  "雪鞋": "Snow boots",
+  "泳裤": "Swim trunks",
+  "折叠水壶": "Collapsible water bottle",
+  "拜访朋友礼物": "Gifts for friends you’re visiting"
+};
+
+const TPL_FR = {
+  "买机票": "Réserver les billets d’avion",
+  "订酒店": "Réserver l’hôtel",
+  "换钱": "Changer de l’argent",
+  "分享行程给朋友": "Partager l’itinéraire avec des amis",
+  "分享行程给家人/朋友": "Partager l’itinéraire avec la famille ou des amis",
+  "锁好贵重物品": "Mettre les objets de valeur en lieu sûr",
+  "重要文件备份": "Sauvegarder les documents importants",
+  "订雪票": "Acheter les forfaits de ski",
+  "护照": "Passeport",
+  "护照/驾照": "Passeport / permis de conduire",
+  "签证及复印件": "Visa + photocopies",
+  "行程单": "Itinéraire",
+  "酒店预订单": "Réservations d’hôtel",
+  "身份证": "Carte d’identité",
+  "驾照（国际驾照）": "Permis de conduire (+ permis international)",
+  "旅行保险": "Assurance voyage",
+  "Schengen签证": "Visa Schengen",
+  "Schengen旅行保险": "Assurance voyage Schengen",
+  "H1B visa": "Visa H1B",
+  "现金": "Espèces",
+  "信用卡": "Cartes bancaires",
+  "外套": "Veste",
+  "长袖衬衫": "Chemises à manches longues",
+  "内衣裤": "Sous-vêtements",
+  "袜子": "Chaussettes",
+  "运动鞋": "Baskets",
+  "拖鞋": "Chaussons / tongs",
+  "帽子": "Casquette ou chapeau",
+  "耳塞/眼罩": "Bouchons d’oreilles / masque de nuit",
+  "雨伞/雨衣": "Parapluie / imperméable",
+  "水壶": "Gourde",
+  "游泳裤": "Maillot de bain",
+  "游泳帽": "Bonnet de bain",
+  "游泳眼镜": "Lunettes de natation",
+  "游泳耳塞": "Bouchons d’oreilles pour la natation",
+  "洗发水": "Shampoing",
+  "沐浴露": "Gel douche",
+  "牙膏牙刷": "Brosse à dents et dentifrice",
+  "毛巾": "Serviette de toilette",
+  "指甲刀": "Coupe-ongles",
+  "棉签": "Cotons-tiges",
+  "梳子": "Peigne",
+  "护肤品": "Produits de soin",
+  "防晒": "Crème solaire",
+  "剃须刀": "Rasoir",
+  "Finasteride": "Finastéride",
+  "止疼药": "Antidouleurs",
+  "感冒药": "Médicaments contre le rhume",
+  "创可贴": "Pansements",
+  "避孕套": "Préservatifs",
+  "防虫驱蚊": "Répulsif anti-insectes",
+  "维生素": "Vitamines",
+  "蛋白粉": "Protéines en poudre",
+  "当地紧急电话": "Numéros d’urgence sur place",
+  "电脑": "Ordinateur portable",
+  "手表": "Montre",
+  "手机x2": "Téléphones (x2)",
+  "手机": "Téléphone",
+  "耳机": "Écouteurs / casque",
+  "电源转换器": "Adaptateur de prise",
+  "电脑充电器": "Chargeur d’ordinateur",
+  "手表充电器": "Chargeur de montre",
+  "移动电源": "Batterie externe",
+  "当地eSIM": "eSIM locale",
+  "滑雪服": "Veste de ski",
+  "滑雪裤": "Pantalon de ski",
+  "保暖内衣裤": "Sous-vêtements thermiques",
+  "手套": "Gants",
+  "护目镜": "Masque de ski",
+  "头盔": "Casque",
+  "面罩": "Tour de cou",
+  "滑雪袜": "Chaussettes de ski",
+  "雪鞋": "Bottes de neige",
+  "泳裤": "Maillot de bain",
+  "折叠水壶": "Gourde pliable",
+  "拜访朋友礼物": "Cadeaux pour les amis qu’on va voir"
+};
+
+const TPL_META = {
+  short: { zh: { name: '3天短途', blurb: '' }, en: { name: 'Short 3-day trip', blurb: '' }, fr: { name: 'Court séjour (3 jours)', blurb: '' } },
+  long: { zh: { name: '1月长途', blurb: '' }, en: { name: 'One-month trip', blurb: '' }, fr: { name: 'Voyage d’un mois', blurb: '' } },
+  ski: { zh: { name: '滑雪之行', blurb: '' }, en: { name: 'Ski trip', blurb: '' }, fr: { name: 'Séjour au ski', blurb: '' } },
+  eu: { zh: { name: '欧洲之行', blurb: '' }, en: { name: 'Europe trip', blurb: '' }, fr: { name: 'Voyage en Europe', blurb: '' } },
+  blank: { zh: { name: '空白清单', blurb: '' }, en: { name: 'Blank list', blurb: '' }, fr: { name: 'Liste vierge', blurb: '' } }
+};
+
+// Built-in templates are stored in Chinese and shown in the active UI language.
+// Once a user edits one, it is frozen in the language they saw (builtin flag removed).
+function localizeTpl(t, lg) {
+  if (!t || !t.builtin) return t;
+  const meta = TPL_META[t.id] && TPL_META[t.id][lg];
+  const tr = lg === 'en' ? TPL_EN : lg === 'fr' ? TPL_FR : null;
+  const out = { id: t.id, tag: t.tag, name: meta ? meta.name : t.name, blurb: meta ? meta.blurb : (t.blurb || ''), lists: {} };
+  Object.keys(t.lists || {}).forEach(k => { out.lists[k] = t.lists[k].map(s => (tr && tr[s]) || s); });
+  return out;
+}
+
+const SANS = '"Helvetica Neue", Helvetica, Arial, sans-serif';
+const GROT = '"Space Grotesk", "Helvetica Neue", Helvetica, sans-serif';
+const BLACKF = '"Archivo Black", "Space Grotesk", Impact, sans-serif';
+const ARCH = 'Archivo, "Helvetica Neue", Helvetica, sans-serif';
+const SBBF = 'SBB, "Helvetica Neue", Helvetica, Arial, sans-serif';
+const ARCHX = ARCH;
+
+const THEMES = {
+  clean: {
+    font: SANS, displayF: SANS, labelF: SANS, btnF: SANS,
+    pageBg: '#e9ecec', switchLabel: 'rgba(28,31,29,0.55)',
+    shell: '#fff', shellR: '42px', shellBorder: 'none', shellShadow: '0 24px 60px rgba(20,30,28,0.18)',
+    statusInk: '#1c1f1d', headBg: '#fff', headBorder: '1px solid #f0f2f1', headPad: '8px 18px 14px',
+    titleS: '17px', titleW: '600', titleC: '#1c1f1d', titleLS: '-0.01em', titleTT: 'none', titleSub: '#9aa0a0', titleAlign: 'center',
+    labelS: '13px', bandS: '14.5px', pillR: '999px', toggleR: '999px', knobR: '50%', squareCheck: false, wide: 'normal', editBg: '#5f6664', plusRx: '9.2', plusCap: 'round', knobShadow: '0 1px 3px rgba(0,0,0,0.2)',
+    ink: '#1c1f1d', sub: '#9aa0a0', accent: '#34c77b', accentInk: '#fff', danger: '#d8341c',
+    labelC: '#9aa0a0', labelW: '400', labelLS: '0.02em',
+    pillPad: '4px 0', pillBorder: 'none', pillBg: 'transparent', pillShadow: 'none', pillInk: '#34c77b', pillW: '500', pillTT: 'none', pillLS: '0',
+    cardBg: '#fff', cardBorderC: '#ecefee', cardBorderW: '1px', cardR: '18px', cardShadow: 'none', cardShadowDrag: '0 10px 26px rgba(20,30,28,0.16)',
+    cardTitleS: '19.5px', cardTitleW: '700', cardTitleLS: '-0.03em', cardTitleTT: 'none',
+    barTrack: '#f0f2f1', barH: '4px', barBorder: 'none', barDone: '#cfd5d3',
+    bandBg: '#f7f8f8', bandC: '#8d9493', bandCount: '#a9afae', bandW: '400', bandLS: '-0.01em', bandTT: 'none', bandBorder: '1px solid #f0f2f1',
+    rowBg: '#fff', div: '#eceeed', divH: '1px', divStrong: '1px solid #f0f2f1',
+    checkDone: '#cfd5d3', checkIdle: '#b3b9b7', checkW: '1.6',
+    doneInk: '#c5cbc9', completeInk: '#9aa0a0',
+    footBg: '#fff', footBorder: '1px solid #f0f2f1', counterW: '300',
+    btnR: '16px', btnBorder: 'none', btnShadow: 'none', btnW: '600', btnTT: 'none', btnLS: '-0.01em',
+    btn2Border: '1.5px solid #dfe4e2', btn2Shadow: 'none', btn2Bg: 'transparent',
+    sheetBg: '#fff', sheetR: '22px 22px 0 0', sheetBorder: 'none',
+    chipR: '999px', chipBorderW: '1.5px', chipIdleBorder: '#ecefee', chipIdleBg: '#fff', chipIdleInk: '#6f7775',
+    chipSelBorder: '#34c77b', chipSelBg: '#f5fbf7', chipSelInk: '#22a566',
+    toggleOff: '#e2e5e4'
+  },
+  max: {
+    font: GROT, displayF: BLACKF, labelF: BLACKF, btnF: BLACKF,
+    pageBg: '#22e3d8', switchLabel: '#0b3a37',
+    shell: '#fff8e7', shellR: '40px', shellBorder: '3px solid #120e1a', shellShadow: '12px 12px 0 #120e1a',
+    statusInk: '#120e1a', headBg: '#d6ff3d', headBorder: '3px solid #120e1a', headPad: '10px 18px 14px',
+    titleS: '19px', titleW: '400', titleC: '#120e1a', titleLS: '-0.01em', titleTT: 'uppercase', titleSub: '#4a4030', titleAlign: 'center',
+    labelS: '13px', bandS: '14.5px', pillR: '999px', toggleR: '999px', knobR: '50%', squareCheck: false, wide: 'normal', editBg: '#5f6664', plusRx: '9.2', plusCap: 'round', knobShadow: '0 1px 3px rgba(0,0,0,0.2)',
+    ink: '#120e1a', sub: '#6e6355', accent: '#6b3ff2', accentInk: '#fff8e7', danger: '#c20030',
+    labelC: '#6b3ff2', labelW: '400', labelLS: '0.1em',
+    pillPad: '7px 14px', pillBorder: '2.5px solid #120e1a', pillBg: '#d6ff3d', pillShadow: '3px 3px 0 #120e1a', pillInk: '#120e1a', pillW: '700', pillTT: 'uppercase', pillLS: '0.05em',
+    cardBg: '#fff', cardBorderC: '#120e1a', cardBorderW: '2.5px', cardR: '20px', cardShadow: '5px 5px 0 #120e1a', cardShadowDrag: '9px 9px 0 #120e1a',
+    cardTitleS: '19px', cardTitleW: '400', cardTitleLS: '-0.01em', cardTitleTT: 'uppercase',
+    barTrack: '#ede6d6', barH: '10px', barBorder: '2px solid #120e1a', barDone: '#b3aa98',
+    bandBg: '#ff9ec4', bandC: '#120e1a', bandCount: '#5a2038', bandW: '400', bandLS: '0.08em', bandTT: 'uppercase', bandBorder: '2.5px solid #120e1a',
+    rowBg: '#fff8e7', div: '#e3d8bf', divH: '2px', divStrong: '2px solid #120e1a',
+    checkDone: '#a99f8d', checkIdle: '#120e1a', checkW: '2.4',
+    doneInk: '#a99f8d', completeInk: '#6e6355',
+    footBg: '#d6ff3d', footBorder: '3px solid #120e1a', counterW: '400',
+    btnR: '14px', btnBorder: '2.5px solid #120e1a', btnShadow: '4px 4px 0 #120e1a', btnW: '400', btnTT: 'uppercase', btnLS: '0.05em',
+    btn2Border: '2.5px solid #120e1a', btn2Shadow: '4px 4px 0 #120e1a', btn2Bg: '#fff8e7',
+    sheetBg: '#fff8e7', sheetR: '24px 24px 0 0', sheetBorder: '3px solid #120e1a',
+    chipR: '999px', chipBorderW: '2.5px', chipIdleBorder: '#120e1a', chipIdleBg: '#fff8e7', chipIdleInk: '#120e1a',
+    chipSelBorder: '#120e1a', chipSelBg: '#d6ff3d', chipSelInk: '#120e1a',
+    toggleOff: '#c9bfa8'
+  },
+  swiss: {
+    font: ARCH, displayF: ARCH, labelF: ARCH, btnF: ARCH,
+    pageBg: '#d9d9d4', switchLabel: 'rgba(17,17,17,0.55)',
+    shell: '#f4f3ef', shellR: '42px', shellBorder: '1px solid #111', shellShadow: '0 18px 40px rgba(17,17,17,0.22)',
+    statusInk: '#111', headBg: '#f4f3ef', headBorder: '1px solid #111', headPad: '8px 18px 14px',
+    titleS: '13px', titleW: '800', titleC: '#111', titleLS: '0.14em', titleTT: 'uppercase', titleSub: '#55554f', titleAlign: 'flex-start',
+    ink: '#111', sub: '#55554f', accent: '#c4340a', accentInk: '#fff', danger: '#b3200c',
+    labelC: '#111', labelW: '800', labelS: '10.5px', labelLS: '0.22em',
+    pillPad: '7px 13px', pillR: '0px', pillBorder: 'none', pillBg: '#c4340a', pillShadow: 'none', pillInk: '#fff', pillW: '800', pillTT: 'uppercase', pillLS: '0.14em',
+    cardBg: '#fff', cardBorderC: '#111', cardBorderW: '1px', cardR: '0px', cardShadow: '0 0 0 rgba(0,0,0,0)', cardShadowDrag: '0 8px 18px rgba(17,17,17,0.2)',
+    cardTitleS: '27px', cardTitleW: '800', cardTitleLS: '-0.045em', cardTitleTT: 'none',
+    barTrack: '#e2e1db', barH: '6px', barBorder: 'none', barDone: '#b7b6b0',
+    bandBg: '#111', bandC: '#f4f3ef', bandCount: '#b9b8b2', bandW: '800', bandS: '11px', bandLS: '0.2em', bandTT: 'uppercase', bandBorder: '1px solid #111',
+    toggleR: '0px', knobR: '0px', squareCheck: true, wide: 'normal', editBg: '#55554f', plusRx: '0', plusCap: 'square', knobShadow: 'none',
+    rowBg: '#f4f3ef', div: '#d5d4ce', divH: '1px', divStrong: '1px solid #cfcec8',
+    checkDone: '#b7b6b0', checkIdle: '#111', checkW: '1.4',
+    doneInk: '#9c9b95', completeInk: '#6b6b66',
+    footBg: '#f4f3ef', footBorder: '1px solid #111', counterW: '700',
+    btnR: '0px', btnBorder: 'none', btnShadow: 'none', btnW: '700', btnTT: 'uppercase', btnLS: '0.08em',
+    btn2Border: '1px solid #111', btn2Shadow: 'none', btn2Bg: 'transparent',
+    sheetBg: '#f4f3ef', sheetR: '0px', sheetBorder: '1px solid #111',
+    chipR: '0px', chipBorderW: '1px', chipIdleBorder: '#111', chipIdleBg: 'transparent', chipIdleInk: '#111',
+    chipSelBorder: '#c4340a', chipSelBg: '#c4340a', chipSelInk: '#fff',
+    toggleOff: '#c4c3bd'
+  },
+  rail: {
+    font: SBBF, displayF: SBBF, labelF: SBBF, btnF: SBBF,
+    pageBg: '#e5e5e5', switchLabel: 'rgba(0,0,0,0.55)',
+    shell: '#fff', shellR: '42px', shellBorder: 'none', shellShadow: '0 18px 44px rgba(0,0,0,0.2)',
+    statusInk: '#000', headBg: '#fff', headBorder: '1px solid #dcdcdc', headPad: '8px 18px 14px',
+    titleS: '18px', titleW: '700', titleC: '#000', titleLS: '0', titleTT: 'none', titleSub: '#5a5a5a', titleAlign: 'center',
+    ink: '#000', sub: '#5a5a5a', accent: '#c60018', accentInk: '#fff', danger: '#a20013',
+    labelC: '#5a5a5a', labelW: '400', labelS: '13px', labelLS: '0.03em',
+    pillPad: '9px 18px', pillR: '32px', pillBorder: 'none', pillBg: '#c60018', pillShadow: 'none', pillInk: '#fff', pillW: '700', pillTT: 'none', pillLS: '0.03em',
+    cardBg: '#fff', cardBorderC: '#dcdcdc', cardBorderW: '1px', cardR: '8px', cardShadow: '0 0 0 rgba(0,0,0,0)', cardShadowDrag: '0 8px 20px rgba(0,0,0,0.18)',
+    cardTitleS: '22px', cardTitleW: '700', cardTitleLS: '0', cardTitleTT: 'none',
+    barTrack: '#e5e5e5', barH: '6px', barBorder: 'none', barDone: '#a8a8a8',
+    bandBg: '#f6f6f6', bandC: '#212121', bandCount: '#5a5a5a', bandW: '700', bandS: '14px', bandLS: '0.03em', bandTT: 'none', bandBorder: '1px solid #dcdcdc',
+    toggleR: '999px', knobR: '50%', squareCheck: false, wide: 'normal', editBg: '#5a5a5a', plusRx: '9.2', plusCap: 'round', knobShadow: '0 1px 3px rgba(0,0,0,0.2)',
+    rowBg: '#fff', div: '#dcdcdc', divH: '1px', divStrong: '1px solid #dcdcdc',
+    checkDone: '#a8a8a8', checkIdle: '#767676', checkW: '1.8',
+    doneInk: '#8d8d8d', completeInk: '#5a5a5a',
+    footBg: '#fff', footBorder: '1px solid #dcdcdc', counterW: '700',
+    btnR: '32px', btnBorder: 'none', btnShadow: 'none', btnW: '700', btnTT: 'none', btnLS: '0.03em',
+    btn2Border: '1px solid #767676', btn2Shadow: 'none', btn2Bg: '#fff',
+    sheetBg: '#fff', sheetR: '16px 16px 0 0', sheetBorder: '1px solid #dcdcdc',
+    chipR: '32px', chipBorderW: '1px', chipIdleBorder: '#dcdcdc', chipIdleBg: '#f6f6f6', chipIdleInk: '#212121',
+    chipSelBorder: '#c60018', chipSelBg: '#c60018', chipSelInk: '#fff',
+    toggleOff: '#a8a8a8'
+  },
+  brutal: {
+    font: GROT, displayF: ARCHX, labelF: ARCHX, btnF: ARCHX,
+    pageBg: '#0a0a0a', switchLabel: 'rgba(255,255,255,0.6)',
+    shell: '#0f0f0f', shellR: '38px', shellBorder: '2px solid #1fe06a', shellShadow: '0 0 0 6px #000',
+    statusInk: '#f2f2f2', headBg: '#0f0f0f', headBorder: '2px solid #f2f2f2', headPad: '10px 18px 14px',
+    titleS: '15px', titleW: '800', titleC: '#f2f2f2', titleLS: '0.1em', titleTT: 'uppercase', titleSub: '#9b9b9b', titleAlign: 'flex-start',
+    ink: '#f2f2f2', sub: '#9b9b9b', accent: '#1fe06a', accentInk: '#0a0a0a', danger: '#ff4d2e',
+    labelC: '#1fe06a', labelW: '800', labelS: '11px', labelLS: '0.2em',
+    pillPad: '8px 14px', pillR: '2px', pillBorder: '2px solid #1fe06a', pillBg: '#1fe06a', pillShadow: 'none', pillInk: '#0a0a0a', pillW: '800', pillTT: 'uppercase', pillLS: '0.1em',
+    cardBg: '#161616', cardBorderC: '#f2f2f2', cardBorderW: '2px', cardR: '2px', cardShadow: '0 0 0 rgba(0,0,0,0)', cardShadowDrag: '0 0 0 3px #1fe06a',
+    cardTitleS: '30px', cardTitleW: '800', cardTitleLS: '-0.05em', cardTitleTT: 'uppercase',
+    barTrack: '#2a2a2a', barH: '12px', barBorder: '2px solid #f2f2f2', barDone: '#5c5c5c',
+    bandBg: '#1fe06a', bandC: '#0a0a0a', bandCount: '#0a0a0a', bandW: '800', bandS: '11px', bandLS: '0.2em', bandTT: 'uppercase', bandBorder: '2px solid #f2f2f2',
+    toggleR: '2px', knobR: '0px', squareCheck: true, wide: '125%', editBg: '#2e2e2e', plusRx: '1', plusCap: 'square', knobShadow: 'none',
+    rowBg: '#0f0f0f', div: '#3a3a3a', divH: '2px', divStrong: '2px solid #2e2e2e',
+    checkDone: '#5c5c5c', checkIdle: '#f2f2f2', checkW: '2.2',
+    doneInk: '#5c5c5c', completeInk: '#9b9b9b',
+    footBg: '#0f0f0f', footBorder: '2px solid #f2f2f2', counterW: '800',
+    btnR: '2px', btnBorder: '2px solid #f2f2f2', btnShadow: 'none', btnW: '800', btnTT: 'uppercase', btnLS: '0.1em',
+    btn2Border: '2px solid #f2f2f2', btn2Shadow: 'none', btn2Bg: 'transparent',
+    sheetBg: '#0f0f0f', sheetR: '0px', sheetBorder: '2px solid #1fe06a',
+    chipR: '2px', chipBorderW: '2px', chipIdleBorder: '#4a4a4a', chipIdleBg: 'transparent', chipIdleInk: '#f2f2f2',
+    chipSelBorder: '#1fe06a', chipSelBg: '#1fe06a', chipSelInk: '#0a0a0a',
+    toggleOff: '#3a3a3a'
+  }
+};
+
+const uid = () => Math.random().toString(36).slice(2, 9);
+const KEY = 'travelChecklist.v3';
+const BACK = { create: 'home', trip: 'home', add: 'trip', settings: 'home', style: 'settings', language: 'settings', templates: 'home', tplEdit: 'templates', tplItem: 'tplEdit' };
+
+function systemLang() {
+  const l = (typeof navigator !== 'undefined' && navigator.language ? navigator.language : 'en').toLowerCase();
+  if (l.indexOf('zh') === 0) return 'zh';
+  if (l.indexOf('fr') === 0) return 'fr';
+  return 'en';
+}
+
+function itemsFrom(tpl) {
+  const out = [];
+  if (!tpl) return out;
+  CATS.forEach(c => { (tpl.lists[c.key] || []).forEach(n => out.push({ id: uid(), cat: c.key, name: n, done: false })); });
+  return out;
+}
+
+// Sample trip shown on first launch. It follows the UI language until the user edits its content.
+const SAMPLE_NAME = { zh: '北海道滑雪周', en: 'Hokkaido ski week', fr: 'Semaine de ski à Hokkaido' };
+const SAMPLE_ITEMS = [
+  { k: 's01', cat: 'pretrip', done: true, zh: "买机票", en: "Book flights", fr: "Réserver les billets d’avion" },
+  { k: 's02', cat: 'pretrip', done: true, zh: "订酒店", en: "Book hotel", fr: "Réserver l’hôtel" },
+  { k: 's03', cat: 'pretrip', done: true, zh: "订雪票", en: "Buy lift tickets", fr: "Acheter les forfaits de ski" },
+  { k: 's04', cat: 'pretrip', done: true, zh: "分享行程给朋友", en: "Share itinerary with friends", fr: "Partager l’itinéraire avec des amis" },
+  { k: 's05', cat: 'docs', done: true, zh: "护照", en: "Passport", fr: "Passeport" },
+  { k: 's06', cat: 'docs', done: true, zh: "旅行保险", en: "Travel insurance", fr: "Assurance voyage" },
+  { k: 's07', cat: 'docs', done: false, zh: "酒店预订单", en: "Hotel confirmations", fr: "Réservations d’hôtel" },
+  { k: 's08', cat: 'clothing', done: false, zh: "保暖内衣裤", en: "Thermal base layers", fr: "Sous-vêtements thermiques" },
+  { k: 's09', cat: 'clothing', done: false, zh: "抓绒/保暖层", en: "Fleece / mid layer", fr: "Polaire / couche intermédiaire" },
+  { k: 's10', cat: 'clothing', done: false, zh: "滑雪袜", en: "Ski socks", fr: "Chaussettes de ski" },
+  { k: 's11', cat: 'clothing', done: false, zh: "雪鞋", en: "Snow boots", fr: "Bottes de neige" },
+  { k: 's12', cat: 'snow', done: false, zh: "滑雪服", en: "Ski jacket", fr: "Veste de ski" },
+  { k: 's13', cat: 'snow', done: false, zh: "滑雪裤", en: "Ski pants", fr: "Pantalon de ski" },
+  { k: 's14', cat: 'snow', done: false, zh: "手套", en: "Gloves", fr: "Gants" },
+  { k: 's15', cat: 'snow', done: false, zh: "护目镜", en: "Goggles", fr: "Masque de ski" },
+  { k: 's16', cat: 'snow', done: false, zh: "头盔", en: "Helmet", fr: "Casque" },
+  { k: 's17', cat: 'snow', done: false, zh: "暖宝宝", en: "Hand warmers", fr: "Chaufferettes" },
+  { k: 's18', cat: 'health', done: false, zh: "止疼药", en: "Pain relievers", fr: "Antidouleurs" },
+  { k: 's19', cat: 'health', done: false, zh: "创可贴", en: "Band-Aids", fr: "Pansements" },
+  { k: 's20', cat: 'health', done: false, zh: "防晒霜/润唇膏", en: "Sunscreen / SPF lip balm", fr: "Crème solaire / baume à lèvres SPF" },
+  { k: 's21', cat: 'tech', done: false, zh: "手机", en: "Phone", fr: "Téléphone" },
+  { k: 's22', cat: 'tech', done: false, zh: "移动电源", en: "Portable charger", fr: "Batterie externe" },
+  { k: 's23', cat: 'tech', done: false, zh: "GoPro", en: "GoPro", fr: "GoPro" }
+];
+const SAMPLE_BY_K = {};
+SAMPLE_ITEMS.forEach(s => { SAMPLE_BY_K[s.k] = s; });
+const SEED_NAMES = ['Hokkaido ski week', '北海道滑雪周', 'Semaine de ski à Hokkaido'];
+
+function makeSampleTrip(lg) {
+  return {
+    id: uid(), name: SAMPLE_NAME[lg] || SAMPLE_NAME.en, start: '2027-02-08', end: '2027-02-15', tpl: 'ski', sample: true,
+    items: SAMPLE_ITEMS.map(s => ({ id: uid(), cat: s.cat, k: s.k, name: s[lg] || s.en, done: s.done }))
+  };
+}
+
+function localizeTrip(t, lg) {
+  if (!t || !t.sample) return t;
+  return {
+    ...t,
+    name: SAMPLE_NAME[lg] || t.name,
+    items: t.items.map(i => (i.k && SAMPLE_BY_K[i.k] ? { ...i, name: SAMPLE_BY_K[i.k][lg] || i.name } : i))
+  };
+}
+
+function itemsLabel(n, lg) {
+  if (lg === 'zh') return n + ' 项';
+  if (lg === 'fr') return n + (n <= 1 ? ' article' : ' articles');
+  return n + (n === 1 ? ' item' : ' items');
+}
+
+function tplCount(tpl) {
+  return CATS.reduce((n, c) => n + ((tpl.lists[c.key] || []).length), 0);
+}
+
+function catFromLabel(raw) {
+  const s = String(raw).trim().toLowerCase();
+  let hit = 'misc';
+  CATS.forEach(c => {
+    if (s === c.key || s === c.en.toLowerCase() || s === c.zh.toLowerCase() || s === c.fr.toLowerCase()) hit = c.key;
+  });
+  const ALIAS = { '文件': 'docs', '个护': 'toiletries', '医疗健康': 'health', '电子产品': 'tech', 'toilette': 'toiletries' };
+  if (ALIAS[s]) hit = ALIAS[s];
+  return hit;
+}
+
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    let saved = null;
+    try { const raw = localStorage.getItem(KEY); if (raw) saved = JSON.parse(raw); } catch (e) { saved = null; }
+    const fresh = () => JSON.parse(JSON.stringify(DEFAULT_TEMPLATES));
+    let templates = saved && saved.templates && saved.templates.length ? saved.templates : fresh();
+    let trips = saved && saved.trips ? saved.trips : null;
+    const lg0 = saved && saved.lang && saved.lang !== 'system' ? saved.lang : systemLang();
+    if (saved && saved.defaultsV !== DEFAULTS_VERSION) {
+      if (saved.defaultsV === 5) {
+        // Templates are already language-aware; nothing to change.
+      } else if (saved.defaultsV === 4) {
+        // Untouched built-ins become language-aware; anything the user changed stays as it is.
+        const defs = fresh();
+        const OLDN = { short: 'Short 3-day trip', long: 'One-month trip', ski: 'Ski trip', eu: 'EU Trip', blank: 'Blank list' };
+        const pristine = (x, d) => JSON.stringify(x.lists) === JSON.stringify(d.lists) && (x.name === OLDN[x.id] || x.name === d.name);
+        templates = (saved.templates || []).map(x => { const d = defs.filter(y => y.id === x.id)[0]; return d && pristine(x, d) ? d : x; });
+      } else {
+        // Older stores: replace the old built-in set, keep templates the user created or imported.
+        const OLD = ['short', 'twoweek', 'month', 'ski', 'eu', 'blank'];
+        const mine = (saved.templates || []).filter(x => OLD.indexOf(x.id) < 0);
+        templates = fresh().concat(mine);
+        if (trips) trips = trips.map(x => x.tpl === 'month' ? { ...x, tpl: 'long' } : x.tpl === 'twoweek' ? { ...x, tpl: 'short' } : x);
+      }
+      // The old, heavy sample trip is swapped for the light one.
+      if (trips) trips = trips.map(x => (x.tpl === 'ski' && !x.sample && SEED_NAMES.indexOf(x.name) >= 0) ? makeSampleTrip(lg0) : x);
+    }
+    if (!trips) trips = [makeSampleTrip(lg0)];
+    this.state = {
+      screen: 'home',
+      trips: trips,
+      templates: templates,
+      lang: (saved && saved.lang) || 'system',
+      theme: validStyle(saved && saved.theme) || validStyle(props.uiStyle) || 'clean',
+      activeId: null,
+      editTplId: null,
+      hidePacked: !!props.hidePackedByDefault,
+      autoCollapse: props.autoCollapseDone !== false,
+      collapsed: {},
+      swiped: null,
+      drag: null,
+      draft: { name: '', start: '', end: '', tpl: 'short' },
+      newItem: { id: null, name: '', cat: 'misc' },
+      tplDraft: { name: '', cat: 'misc' },
+      sheet: null,
+      modal: null,
+      sc: { t: 0, h: 1, c: 1 },
+      modalText: '',
+      copied: false
+    };
+    this.px = 0;
+    this.py = 0;
+    this.rows = {};
+    this.moved = false;
+  }
+
+  measureScroll() {
+    const el = this.scrollEl;
+    if (!el) return;
+    const next = { t: el.scrollTop, h: el.scrollHeight, c: el.clientHeight };
+    const cur = this.state.sc || {};
+    if (cur.t !== next.t || cur.h !== next.h || cur.c !== next.c) this.setState({ sc: next });
+  }
+
+  componentDidMount() {
+    requestAnimationFrame(() => this.measureScroll());
+    this.persist();
+    this.onHide = () => this.persist();
+    try { window.addEventListener('pagehide', this.onHide); document.addEventListener('visibilitychange', this.onHide); } catch (e) {}
+  }
+
+  componentWillUnmount() {
+    try { window.removeEventListener('pagehide', this.onHide); document.removeEventListener('visibilitychange', this.onHide); } catch (e) {}
+  }
+
+  componentDidUpdate() {
+    requestAnimationFrame(() => this.measureScroll());
+    this.persist();
+  }
+
+  persist(next) {
+    const st = this.state || {};
+    const data = {
+      defaultsV: DEFAULTS_VERSION,
+      trips: next && next.trips ? next.trips : st.trips,
+      templates: next && next.templates ? next.templates : st.templates,
+      lang: next && next.lang ? next.lang : st.lang,
+      theme: next && next.theme ? next.theme : st.theme
+    };
+    let json = '';
+    try { json = JSON.stringify(data); } catch (e) { return; }
+    if (json === this.lastSaved) return;
+    try { localStorage.setItem(KEY, json); this.lastSaved = json; } catch (e) {}
+  }
+
+  tripsView() { const lg = this.lang(); return this.state.trips.map(x => localizeTrip(x, lg)); }
+
+  setTrips(fn) {
+    this.setState(s => {
+      const lg = this.lang();
+      const rawById = {};
+      s.trips.forEach(x => { rawById[x.id] = x; });
+      const base = s.trips.map(x => { const v = localizeTrip(x, lg); return { ...v, items: v.items.map(i => ({ ...i })) }; });
+      const baseById = {};
+      base.forEach(x => { baseById[x.id] = x; });
+      const same = (a, b1, b2) => a === b1 || a === b2;
+      const trips = fn(base).map(r => {
+        if (!r.sample) return r;
+        const b = baseById[r.id];
+        const raw = rawById[r.id];
+        if (!b || !raw) return r;
+        // A sample trip keeps following the UI language until its content (not its checkmarks) is edited.
+        let edited = !same(r.name, b.name, raw.name) || r.items.length !== b.items.length;
+        if (!edited) {
+          const bi = {};
+          const ri = {};
+          b.items.forEach(i => { bi[i.id] = i; });
+          raw.items.forEach(i => { ri[i.id] = i; });
+          edited = r.items.some(i => !bi[i.id] || i.cat !== bi[i.id].cat || !same(i.name, bi[i.id].name, ri[i.id] && ri[i.id].name));
+        }
+        if (!edited) return r;
+        const frozen = { ...r };
+        delete frozen.sample;
+        return frozen;
+      });
+      this.persist({ trips: trips });
+      return { trips: trips };
+    });
+  }
+
+  setTemplates(fn) {
+    this.setState(s => {
+      const templates = fn(JSON.parse(JSON.stringify(s.templates)));
+      this.persist({ templates: templates });
+      return { templates: templates };
+    });
+  }
+
+  mutTpl(id, fn) {
+    const lg = this.lang();
+    this.setTemplates(list => list.map(t => {
+      if (t.id !== id) return t;
+      if (t.builtin) { const loc = localizeTpl(t, lg); t.name = loc.name; t.blurb = loc.blurb; t.lists = loc.lists; delete t.builtin; }
+      fn(t);
+      return t;
+    }));
+  }
+
+  lang() {
+    return this.state.lang === 'system' ? systemLang() : this.state.lang;
+  }
+
+  catLabel(c) {
+    return c[this.lang()] || c.en;
+  }
+
+  active() { return this.tripsView().filter(t => t.id === this.state.activeId)[0] || null; }
+  tpls() { const lg = this.lang(); return this.state.templates.map(t => localizeTpl(t, lg)); }
+  editedTpl() { return this.tpls().filter(t => t.id === this.state.editTplId)[0] || null; }
+
+  go(screen, extra) {
+    this.setState({ screen: screen, swiped: null, sheet: null, drag: null, ...(extra || {}) });
+  }
+
+  fmtDay(iso) {
+    if (!iso) return '';
+    const p = String(iso).split('-');
+    if (p.length < 3) return '';
+    const d = new Date(Number(p[0]), Number(p[1]) - 1, Number(p[2]));
+    if (isNaN(d.getTime())) return '';
+    return d.toLocaleDateString(LOCALE[this.lang()], { month: 'short', day: 'numeric' });
+  }
+
+  nightsLabel(a, b) {
+    if (!a || !b) return '';
+    const n = Math.round((new Date(b) - new Date(a)) / 86400000);
+    if (!(n > 0)) return '';
+    const lg = this.lang();
+    if (lg === 'zh') return n + ' 晚';
+    if (lg === 'fr') return n + (n === 1 ? ' nuit' : ' nuits');
+    return n + (n === 1 ? ' night' : ' nights');
+  }
+
+  toMarkdown(tpl) {
+    const lines = ['# ' + tpl.name];
+    if (tpl.blurb) lines.push('', tpl.blurb);
+    CATS.forEach(c => {
+      const arr = tpl.lists[c.key] || [];
+      if (!arr.length) return;
+      lines.push('', '## ' + this.catLabel(c));
+      arr.forEach(n => lines.push('- ' + n));
+    });
+    return lines.join('\n') + '\n';
+  }
+
+  allTripsMarkdown() {
+    const out = [];
+    this.tripsView().forEach(t => {
+      const range = [this.fmtDay(t.start), this.fmtDay(t.end)].filter(Boolean).join(' – ');
+      const done = t.items.filter(i => i.done).length;
+      out.push('# ' + t.name);
+      out.push('');
+      out.push([range, done + ' / ' + t.items.length].filter(Boolean).join(' · '));
+      CATS.forEach(c => {
+        const arr = t.items.filter(i => i.cat === c.key);
+        if (!arr.length) return;
+        out.push('', '## ' + this.catLabel(c));
+        arr.forEach(i => out.push('- [' + (i.done ? 'x' : ' ') + '] ' + i.name));
+      });
+      out.push('', '---', '');
+    });
+    return out.join('\n');
+  }
+
+  parseMarkdown(text) {
+    const lines = String(text).split(/\r?\n/);
+    let name = '';
+    let blurb = '';
+    let cat = 'misc';
+    const lists = {};
+    lines.forEach(raw => {
+      const line = raw.trim();
+      if (!line) return;
+      if (/^#{2,}\s*/.test(line)) { cat = catFromLabel(line.replace(/^#+\s*/, '')); return; }
+      if (/^#\s*/.test(line)) { name = line.replace(/^#\s*/, ''); return; }
+      const bullet = line.match(/^[-*+•]\s*(\[[ xX]\]\s*)?(.+)$/);
+      if (bullet) {
+        lists[cat] = (lists[cat] || []).concat([bullet[2].trim()]);
+        return;
+      }
+      if (/[:：]$/.test(line)) { cat = catFromLabel(line.replace(/[:：]$/, '')); return; }
+      if (!name) { name = line; return; }
+      if (!blurb && !Object.keys(lists).length) { blurb = line; return; }
+      lists[cat] = (lists[cat] || []).concat([line]);
+    });
+    return { name: name || 'Imported list', blurb: blurb, lists: lists };
+  }
+
+  renderVals() {
+    const st = { ...this.state, trips: this.tripsView() };
+    const lg = this.lang();
+    const L = STR[lg];
+    const strike = this.props.completedStyle === 'strikethrough';
+    const trip = this.active();
+    const etpl = this.editedTpl();
+    const curStyle = STYLES.filter(x => x.id === st.theme)[0] || STYLES[0];
+    const themeKey = curStyle.key;
+    const T = THEMES[themeKey] || THEMES.clean;
+    const v = { L: L, T: T };
+
+    const sc = st.sc || { t: 0, h: 1, c: 1 };
+    v.scrollRef = el => { this.scrollEl = el; };
+    v.onScroll = () => this.measureScroll();
+    v.scrollThumbShow = sc.h > sc.c + 4;
+    const thumbH = Math.max(40, Math.round((sc.c / sc.h) * sc.c));
+    const maxT = Math.max(1, sc.h - sc.c);
+    v.scrollThumbH = thumbH;
+    v.scrollThumbTop = Math.round((sc.t / maxT) * (sc.c - thumbH - 8)) + 4;
+
+    v.isHome = st.screen === 'home';
+    v.isCreate = st.screen === 'create';
+    v.isTrip = st.screen === 'trip';
+    v.isAdd = st.screen === 'add';
+    v.isSettings = st.screen === 'settings';
+    v.isLanguage = st.screen === 'language';
+    v.isStyle = st.screen === 'style';
+    v.isTemplates = st.screen === 'templates';
+    v.isTplEdit = st.screen === 'tplEdit';
+    v.isTplItem = st.screen === 'tplItem';
+    v.canGoBack = !v.isHome;
+    v.plainHeaderRight = !v.isHome && !v.isTrip;
+    v.title = v.isHome ? L.packingLists
+      : v.isCreate ? (st.editTripId ? L.editTrip : L.newTrip)
+      : v.isAdd ? (st.newItem.id ? L.editItem : L.addItem)
+      : v.isSettings ? L.settings
+      : v.isLanguage ? L.language
+      : v.isStyle ? L.style
+      : v.isTemplates ? L.templates
+      : v.isTplEdit ? L.editTemplate
+      : v.isTplItem ? L.addItem
+      : (trip ? trip.name : L.trip);
+
+    if (trip && v.isTrip && this.props.showTripDates !== false) {
+      const r = [this.fmtDay(trip.start), this.fmtDay(trip.end)].filter(Boolean).join(' – ');
+      const nl = this.nightsLabel(trip.start, trip.end);
+      v.tripSubtitle = r ? (nl ? r + ' · ' + nl : r) : '';
+      v.showTripSubtitle = !!v.tripSubtitle;
+    } else {
+      v.tripSubtitle = '';
+      v.showTripSubtitle = false;
+    }
+
+    v.goBack = () => this.go(BACK[st.screen] || 'home');
+    v.openSettings = () => this.go('settings');
+    v.openTemplates = () => this.go('templates');
+    v.startCreate = () => this.go('create', { draft: { name: '', start: '', end: '', tpl: 'short' }, editTripId: null });
+    v.openAdd = () => this.go('add', { newItem: { id: null, name: '', cat: 'misc' } });
+    v.openTripSheet = () => this.setState({ sheet: 'trip' });
+    v.closeSheet = () => this.setState({ sheet: null });
+
+    const LANGS = [
+      { id: 'system', label: L.systemLang, hint: { system: 'English', en: 'English', zh: '简体中文', fr: 'Français' }[systemLang()] },
+      { id: 'en', label: 'English', hint: '' },
+      { id: 'zh', label: '简体中文', hint: '' },
+      { id: 'fr', label: 'Français', hint: '' }
+    ];
+    v.openLanguage = () => this.go('language');
+    v.openStyle = () => this.go('style');
+    v.styleValue = curStyle.names[lg] || curStyle.names.en;
+    v.styleRows = STYLES.map(x => ({
+      label: x.names[lg] || x.names.en,
+      selected: st.theme === x.id,
+      pick: () => this.setState({ theme: x.id, screen: 'settings' })
+    }));
+    v.langValue = (LANGS.filter(r => r.id === st.lang)[0] || LANGS[0]).label;
+    v.langRows = LANGS.map(r => ({
+      label: r.label, hint: r.hint, selected: st.lang === r.id,
+      pick: () => { this.persist({ lang: r.id }); this.setState({ lang: r.id, screen: 'settings' }); }
+    }));
+
+    v.tripsLabel = lg === 'zh' ? st.trips.length + ' 个行程'
+      : lg === 'fr' ? st.trips.length + (st.trips.length === 1 ? ' voyage' : ' voyages')
+      : st.trips.length + (st.trips.length === 1 ? ' trip' : ' trips');
+    v.noTrips = st.trips.length === 0;
+
+    const drag = st.drag;
+    v.showTripDates = this.props.showTripDates !== false;
+    v.hideTripDates = this.props.showTripDates === false;
+    const ordered = st.trips.slice().sort((a, b) => {
+      const ca = a.items.length > 0 && a.items.every(x => x.done) ? 1 : 0;
+      const cb = b.items.length > 0 && b.items.every(x => x.done) ? 1 : 0;
+      return ca - cb;
+    });
+    v.trips = ordered.map((t, i) => {
+      const total = t.items.length;
+      const done = t.items.filter(x => x.done).length;
+      const isDragged = !!drag && drag.id === t.id;
+      let ty = 0;
+      if (drag && !isDragged) {
+        if (drag.over > drag.index && i > drag.index && i <= drag.over) ty = -drag.h;
+        else if (drag.over < drag.index && i >= drag.over && i < drag.index) ty = drag.h;
+      } else if (isDragged) { ty = drag.dy; }
+      const range = [this.fmtDay(t.start), this.fmtDay(t.end)].filter(Boolean).join(' – ');
+      const nl = this.nightsLabel(t.start, t.end);
+      const complete = total > 0 && done === total;
+      return {
+        name: t.name,
+        complete: complete,
+        meta: range ? (nl ? range + ' · ' + nl : range) : '',
+        countLabel: complete ? L.packedBadge : done + ' / ' + total + ' ' + L.packed,
+        countColor: T.sub,
+        countWeight: '400',
+        titleColor: complete ? T.completeInk : T.ink,
+        barColor: complete ? T.barDone : T.accent,
+        cardBg: T.cardBg,
+        pct: total ? Math.round((done / total) * 100) : 0,
+        ty: ty, z: isDragged ? 5 : 1,
+        border: T.cardBorderC,
+        shadow: isDragged ? T.cardShadowDrag : T.cardShadow,
+        ref: el => { if (el) this.rows[t.id] = el; },
+        open: () => {
+          if (this.moved) { this.moved = false; return; }
+          this.go('trip', { activeId: t.id, hidePacked: !!this.props.hidePackedByDefault, collapsed: {} });
+        },
+        dragStart: e => {
+          const el = this.rows[t.id];
+          const h = (el ? el.offsetHeight : 104) + 12;
+          this.py = e.clientY;
+          this.moved = false;
+          if (e.currentTarget.setPointerCapture) e.currentTarget.setPointerCapture(e.pointerId);
+          this.setState({ drag: { id: t.id, index: i, over: i, dy: 0, h: h } });
+        },
+        dragMove: e => {
+          const d = this.state.drag;
+          if (!d || d.id !== t.id) return;
+          const dy = e.clientY - this.py;
+          if (Math.abs(dy) > 4) this.moved = true;
+          const off = Math.round(dy / d.h);
+          const over = Math.max(0, Math.min(ordered.length - 1, d.index + off));
+          this.setState({ drag: { ...d, dy: dy, over: over } });
+        },
+        dragEnd: () => {
+          const d = this.state.drag;
+          if (d && d.over !== d.index) {
+            const a = ordered.slice();
+            const m = a.splice(d.index, 1)[0];
+            a.splice(d.over, 0, m);
+            this.setTrips(() => a);
+          }
+          this.setState({ drag: null });
+          setTimeout(() => { this.moved = false; }, 120);
+        }
+      };
+    });
+
+    v.templateCount = st.templates.length;
+    v.templateCards = this.tpls().map(tpl => ({
+      tag: tpl.tag || '•', name: tpl.name,
+      blurb: itemsLabel(tplCount(tpl), lg),
+      detail: itemsLabel(tplCount(tpl), lg),
+      selected: st.draft.tpl === tpl.id,
+      border: st.draft.tpl === tpl.id ? T.accent : T.chipIdleBorder,
+      bg: st.draft.tpl === tpl.id ? T.chipSelBg : T.cardBg,
+      select: () => this.setState(s => ({ draft: { ...s.draft, tpl: tpl.id } })),
+      pick: () => this.go('create', { draft: { name: '', start: '', end: '', tpl: tpl.id }, editTripId: null })
+    }));
+    v.templateRows = this.tpls().map(tpl => ({
+      name: tpl.name,
+      sub: itemsLabel(tplCount(tpl), lg),
+      edit: () => this.go('tplEdit', { editTplId: tpl.id })
+    }));
+    v.newTemplate = () => {
+      const id = 'c' + uid();
+      this.setTemplates(list => list.concat([{ id: id, tag: '★', name: L.newTemplate, blurb: '', lists: {} }]));
+      this.go('tplEdit', { editTplId: id });
+    };
+
+    v.draftName = st.draft.name;
+    v.draftStart = st.draft.start;
+    v.draftEnd = st.draft.end;
+    const dnl = this.nightsLabel(st.draft.start, st.draft.end);
+    v.draftDateNote = dnl ? dnl + ' · ' + this.fmtDay(st.draft.start) + ' – ' + this.fmtDay(st.draft.end) : '';
+    v.showDateNote = !!dnl;
+    v.setName = e => { const x = e.target.value; this.setState(s => ({ draft: { ...s.draft, name: x } })); };
+    v.setStart = e => { const x = e.target.value; this.setState(s => ({ draft: { ...s.draft, start: x } })); };
+    v.setEnd = e => { const x = e.target.value; this.setState(s => ({ draft: { ...s.draft, end: x } })); };
+    v.showTplPicker = !st.editTripId;
+    v.createCta = st.editTripId ? L.saveChanges : L.createTrip;
+    v.createTrip = () => {
+      const d = st.draft;
+      if (st.editTripId) {
+        const eid = st.editTripId;
+        this.setTrips(list => list.map(t => t.id !== eid ? t : { ...t, name: d.name.trim() || t.name, start: d.start, end: d.end }));
+        this.go('trip', { activeId: eid, editTripId: null });
+        return;
+      }
+      const tpl = this.tpls().filter(t => t.id === d.tpl)[0];
+      const id = uid();
+      this.setTrips(list => list.concat([{ id: id, name: d.name.trim() || (tpl ? tpl.name : L.newTrip), start: d.start, end: d.end, tpl: d.tpl, items: itemsFrom(tpl) }]));
+      this.go('trip', { activeId: id, collapsed: {}, hidePacked: !!this.props.hidePackedByDefault });
+    };
+
+    if (trip) {
+      v.doneCount = trip.items.filter(i => i.done).length;
+      v.totalCount = trip.items.length;
+      v.fbg = st.hidePacked ? T.accent : T.toggleOff;
+      v.fx = st.hidePacked ? 20 : 0;
+      v.toggleUnpacked = () => this.setState(s => ({ hidePacked: !s.hidePacked, swiped: null }));
+
+      v.groups = CATS.filter(c => trip.items.some(i => i.cat === c.key)).map(c => {
+        const all = trip.items.filter(i => i.cat === c.key);
+        const cdone = all.filter(i => i.done).length;
+        const autoClosed = st.autoCollapse && all.length > 0 && cdone === all.length && st.collapsed[c.key] === undefined;
+        const open = st.collapsed[c.key] === undefined ? !autoClosed : !st.collapsed[c.key];
+        const shown = st.hidePacked ? all.filter(i => !i.done) : all;
+        return {
+          label: this.catLabel(c),
+          count: cdone + ' / ' + all.length,
+          open: open, closed: !open,
+          empty: open && shown.length === 0,
+          toggle: () => this.setState(s => ({ collapsed: { ...s.collapsed, [c.key]: open }, swiped: null })),
+          items: shown.map(it => {
+            const swiped = st.swiped === it.id;
+            return {
+              name: it.name, done: it.done, undone: !it.done, swiped: swiped,
+              doneRound: it.done && !T.squareCheck, undoneRound: !it.done && !T.squareCheck,
+              doneSquare: it.done && !!T.squareCheck, undoneSquare: !it.done && !!T.squareCheck,
+              dx: swiped ? -176 : 0,
+              color: it.done ? T.doneInk : T.ink,
+              deco: it.done && strike ? 'line-through' : 'none',
+              tickAnim: it.done && st.justChecked === it.id && this.props.tickAnimation !== false ? 'tickDraw 0.3s cubic-bezier(0.55,0,0.3,1) both' : 'none',
+              strikeAnim: 'none',
+              toggle: () => {
+                if (st.swiped) { this.setState({ swiped: null }); return; }
+                this.setState({ justChecked: it.done ? null : it.id });
+                this.setTrips(list => list.map(t => t.id !== trip.id ? t : { ...t, items: t.items.map(x => x.id === it.id ? { ...x, done: !x.done } : x) }));
+              },
+              edit: () => this.go('add', { newItem: { id: it.id, name: it.name, cat: it.cat } }),
+              remove: () => {
+                this.setState({ swiped: null });
+                this.setTrips(list => list.map(t => t.id !== trip.id ? t : { ...t, items: t.items.filter(x => x.id !== it.id) }));
+              },
+              down: e => { this.px = e.clientX; },
+              move: e => {
+                const d = e.clientX - this.px;
+                if (d < -28 && st.swiped !== it.id) this.setState({ swiped: it.id });
+                else if (d > 28 && st.swiped === it.id) this.setState({ swiped: null });
+              }
+            };
+          })
+        };
+      });
+
+      v.sheetOpen = st.sheet === 'trip';
+      v.sheetTitle = trip.name;
+      v.sheetActions = [
+        { label: L.editTrip, color: T.ink, run: () => this.go('create', { draft: { name: trip.name, start: trip.start || '', end: trip.end || '', tpl: trip.tpl }, editTripId: trip.id, sheet: null }) },
+        { label: L.resetChecks, color: T.ink, run: () => { this.setTrips(list => list.map(t => t.id !== trip.id ? t : { ...t, items: t.items.map(x => ({ ...x, done: false })) })); this.setState({ sheet: null, collapsed: {} }); } },
+        { label: L.markAllPacked, color: T.ink, run: () => { this.setTrips(list => list.map(t => t.id !== trip.id ? t : { ...t, items: t.items.map(x => ({ ...x, done: true })) })); this.setState({ sheet: null }); } },
+        { label: L.expandAll, color: T.ink, run: () => { const c = {}; CATS.forEach(k => { c[k.key] = false; }); this.setState({ collapsed: c, sheet: null }); } },
+        { label: L.saveAsTemplate, color: T.ink, run: () => {
+          const id = 'c' + uid();
+          const lists = {};
+          CATS.forEach(c => { const n = trip.items.filter(i => i.cat === c.key).map(i => i.name); if (n.length) lists[c.key] = n; });
+          this.setTemplates(list => list.concat([{ id: id, tag: '★', name: trip.name, blurb: '', lists: lists }]));
+          this.go('tplEdit', { editTplId: id });
+        } },
+        { label: L.deleteTrip, color: T.danger, run: () => { this.setTrips(list => list.filter(t => t.id !== trip.id)); this.go('home', { activeId: null }); } }
+      ];
+    } else {
+      v.groups = [];
+      v.doneCount = 0;
+      v.totalCount = 0;
+      v.fbg = T.toggleOff;
+      v.fx = 0;
+      v.sheetOpen = false;
+      v.sheetActions = [];
+    }
+
+    v.newItemName = st.newItem.name;
+    v.addCta = st.newItem.id ? L.saveChanges : L.addToList;
+    v.setNewItem = e => { const x = e.target.value; this.setState(s => ({ newItem: { ...s.newItem, name: x } })); };
+    v.catChips = CATS.map(c => ({
+      label: this.catLabel(c),
+      border: st.newItem.cat === c.key ? T.chipSelBorder : T.chipIdleBorder,
+      bg: st.newItem.cat === c.key ? T.chipSelBg : T.chipIdleBg,
+      color: st.newItem.cat === c.key ? T.chipSelInk : T.chipIdleInk,
+      pick: () => this.setState(s => ({ newItem: { ...s.newItem, cat: c.key } }))
+    }));
+    v.addItem = () => {
+      const n = st.newItem.name.trim();
+      if (!n || !trip) { this.go('trip'); return; }
+      const ni = st.newItem;
+      if (ni.id) {
+        this.setTrips(list => list.map(t => t.id !== trip.id ? t : { ...t, items: t.items.map(x => x.id === ni.id ? { ...x, name: n, cat: ni.cat } : x) }));
+      } else {
+        this.setTrips(list => list.map(t => t.id !== trip.id ? t : { ...t, items: t.items.concat([{ id: uid(), cat: ni.cat, name: n, done: false }]) }));
+      }
+      this.setState(s => ({ screen: 'trip', swiped: null, collapsed: { ...s.collapsed, [ni.cat]: false } }));
+    };
+
+    if (etpl) {
+      v.tplName = etpl.name;
+      v.tplBlurb = etpl.blurb || '';
+      v.tplCountLabel = itemsLabel(tplCount(etpl), lg);
+      v.tplEmpty = tplCount(etpl) === 0;
+      v.setTplName = e => { const x = e.target.value; this.mutTpl(etpl.id, t => { t.name = x; }); };
+      v.setTplBlurb = e => { const x = e.target.value; this.mutTpl(etpl.id, t => { t.blurb = x; }); };
+      v.tplGroups = CATS.filter(c => (etpl.lists[c.key] || []).length).map(c => ({
+        label: this.catLabel(c),
+        items: (etpl.lists[c.key] || []).map(name => ({
+          name: name,
+          remove: () => this.mutTpl(etpl.id, t => { t.lists[c.key] = (t.lists[c.key] || []).filter(x => x !== name); })
+        }))
+      }));
+      v.deleteTemplate = () => { this.setTemplates(list => list.filter(t => t.id !== etpl.id)); this.go('templates', { editTplId: null }); };
+      v.duplicateTemplate = () => {
+        const id = 'c' + uid();
+        const copy = JSON.parse(JSON.stringify(etpl));
+        delete copy.builtin;
+        copy.id = id;
+        copy.name = etpl.name + (lg === 'zh' ? ' 副本' : lg === 'fr' ? ' (copie)' : ' copy');
+        this.setTemplates(list => list.concat([copy]));
+        this.go('tplEdit', { editTplId: id });
+      };
+      v.exportTemplate = () => this.setState({ modal: 'export', modalText: this.toMarkdown(etpl), copied: false });
+      v.doneTemplate = () => this.go('templates', { editTplId: null });
+      v.openTplItem = () => this.go('tplItem', { tplDraft: { name: '', cat: 'misc' } });
+      v.tplItemName = st.tplDraft.name;
+      v.setTplItemName = e => { const x = e.target.value; this.setState(s => ({ tplDraft: { ...s.tplDraft, name: x } })); };
+      v.tplCatChips = CATS.map(c => ({
+        label: this.catLabel(c),
+        border: st.tplDraft.cat === c.key ? T.chipSelBorder : T.chipIdleBorder,
+        bg: st.tplDraft.cat === c.key ? T.chipSelBg : T.chipIdleBg,
+        color: st.tplDraft.cat === c.key ? T.chipSelInk : T.chipIdleInk,
+        pick: () => this.setState(s => ({ tplDraft: { ...s.tplDraft, cat: c.key } }))
+      }));
+      v.addTplItem = () => {
+        const n = st.tplDraft.name.trim();
+        if (n) this.mutTpl(etpl.id, t => { t.lists[st.tplDraft.cat] = (t.lists[st.tplDraft.cat] || []).concat([n]); });
+        this.go('tplEdit');
+      };
+    } else {
+      v.tplGroups = [];
+      v.tplCatChips = [];
+      v.tplEmpty = false;
+      v.tplName = '';
+      v.tplBlurb = '';
+      v.tplItemName = '';
+      v.tplCountLabel = '';
+      v.doneTemplate = () => this.go('templates');
+      v.openTplItem = () => this.go('templates');
+      v.addTplItem = () => this.go('templates');
+      v.deleteTemplate = () => this.go('templates');
+      v.duplicateTemplate = () => this.go('templates');
+      v.exportTemplate = () => this.go('templates');
+      v.setTplName = () => {};
+      v.setTplBlurb = () => {};
+      v.setTplItemName = () => {};
+    }
+
+    const isExport = st.modal === 'export' || st.modal === 'exportAll';
+    v.modalOpen = !!st.modal;
+    v.isExportModal = isExport;
+    v.modalTitle = st.modal === 'exportAll' ? L.exportAllTitle : st.modal === 'export' ? L.exportTitle : L.importTitle;
+    v.modalHint = isExport ? L.exportHint : L.importHint;
+    v.modalText = st.modalText;
+    v.modalCta = isExport ? (st.copied ? L.copied : L.copy) : L.importCta;
+    v.exportAllTrips = () => this.setState({ modal: 'exportAll', modalText: this.allTripsMarkdown(), copied: false });
+    v.setModalText = e => { const x = e.target.value; this.setState({ modalText: x }); };
+    v.closeModal = () => this.setState({ modal: null, modalText: '', copied: false });
+    v.openImport = () => this.setState({ modal: 'import', modalText: '', copied: false });
+    v.modalAction = () => {
+      if (isExport) {
+        try { if (navigator.clipboard) navigator.clipboard.writeText(st.modalText); } catch (e) {}
+        this.setState({ copied: true });
+        return;
+      }
+      const parsed = this.parseMarkdown(st.modalText);
+      if (!Object.keys(parsed.lists).length) { this.setState({ modal: null, modalText: '' }); return; }
+      const id = 'c' + uid();
+      this.setTemplates(list => list.concat([{ id: id, tag: '↓', name: parsed.name, blurb: parsed.blurb, lists: parsed.lists }]));
+      this.setState({ modal: null, modalText: '', screen: 'tplEdit', editTplId: id });
+    };
+    v.downloadMd = () => {
+      try {
+        const blob = new Blob([st.modalText], { type: 'text/markdown' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        const base = st.modal === 'exportAll' ? 'all-trips' : ((etpl && etpl.name) || 'template');
+        a.download = base.replace(/[^\w\u4e00-\u9fa5-]+/g, '-') + '.md';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+      } catch (e) {}
+    };
+
+    v.s1bg = st.hidePacked ? T.accent : T.toggleOff;
+    v.s1x = st.hidePacked ? 20 : 0;
+    v.s2bg = st.autoCollapse ? T.accent : T.toggleOff;
+    v.s2x = st.autoCollapse ? 20 : 0;
+    v.toggleDefaultUnpacked = () => this.setState(s => ({ hidePacked: !s.hidePacked }));
+    v.toggleAutoCollapse = () => this.setState(s => ({ autoCollapse: !s.autoCollapse, collapsed: {} }));
+    v.askResetAll = () => { this.setTrips(list => list.map(t => ({ ...t, items: t.items.map(x => ({ ...x, done: false })) }))); this.setState({ collapsed: {} }); };
+    v.askWipe = () => { this.setTrips(() => []); this.go('home', { activeId: null }); };
+
+    return v;
+  }
+}
+
+</script>
+</body>
+</html>
