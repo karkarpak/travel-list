@@ -77,42 +77,43 @@
       </span>
     </div>
 
-    <div style="flex: none; display: flex; align-items: center; gap: 10px; padding: {{ headerPad }}; background: {{ T.headBg }}; border-bottom: {{ T.headBorder }};">
-      <sc-if value="{{ canGoBack }}" hint-placeholder-val="{{ true }}">
-        <div onClick="{{ goBack }}" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; margin-left: -8px; cursor: pointer;">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="{{ T.accent }}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"></path><path d="M11 6l-6 6 6 6"></path></svg>
-        </div>
-      </sc-if>
-      <sc-if value="{{ showHomeEdit }}" hint-placeholder-val="{{ true }}">
-        <div onClick="{{ startHomeEdit }}" style="height: 44px; display: flex; align-items: center; justify-content: center; padding: 0 6px; margin-left: -6px; border-radius: 10px; cursor: pointer; font-family: {{ T.font }}; font-size: 14.5px; font-weight: 400; color: {{ T.sub }}; letter-spacing: -0.01em; -webkit-tap-highlight-color: rgba(0,0,0,0.1);">{{ L.edit }}</div>
-      </sc-if>
-      <sc-if value="{{ showHomeDone }}" hint-placeholder-val="{{ false }}">
-        <div onClick="{{ endHomeEdit }}" style="height: 44px; display: flex; align-items: center; justify-content: center; padding: 0 6px; margin-left: -6px; border-radius: 10px; cursor: pointer; font-family: {{ T.font }}; font-size: 14.5px; font-weight: 400; color: {{ T.sub }}; letter-spacing: -0.01em; -webkit-tap-highlight-color: rgba(0,0,0,0.1);">{{ L.done }}</div>
-      </sc-if>
-      <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: {{ T.titleAlign }}; justify-content: center; gap: 1px;">
-        <div style="font-family: {{ T.displayF }}; font-stretch: {{ T.wide }}; font-size: {{ T.titleS }}; font-weight: {{ T.titleW }}; color: {{ T.titleC }}; letter-spacing: {{ T.titleLS }}; text-transform: {{ T.titleTT }}; line-height: 1.2;">{{ title }}</div>
-        <sc-if value="{{ showTripSubtitle }}" hint-placeholder-val="{{ false }}">
-          <div style="font-size: 12.5px; color: {{ T.titleSub }};">{{ tripSubtitle }}</div>
+    <div style="flex: none; position: relative; display: flex; align-items: center; justify-content: space-between; min-height: 44px; padding: {{ headerPad }}; background: {{ T.headBg }}; border-bottom: {{ T.headBorder }};">
+      <div style="position: relative; z-index: 1; display: flex; align-items: center; justify-content: flex-start; min-width: 80px;">
+        <sc-if value="{{ canGoBack }}" hint-placeholder-val="{{ true }}">
+          <div onClick="{{ goBack }}" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; margin-left: -8px; cursor: pointer;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="{{ T.accent }}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"></path><path d="M11 6l-6 6 6 6"></path></svg>
+          </div>
+        </sc-if>
+        <sc-if value="{{ showHomeEdit }}" hint-placeholder-val="{{ true }}">
+          <div onClick="{{ startHomeEdit }}" style="height: 40px; display: flex; align-items: center; justify-content: center; padding: 0 6px; margin-left: -6px; border-radius: 10px; cursor: pointer; font-family: {{ T.font }}; font-size: 14.5px; font-weight: 400; color: {{ T.sub }}; letter-spacing: -0.01em; -webkit-tap-highlight-color: rgba(0,0,0,0.1);">{{ L.edit }}</div>
+        </sc-if>
+        <sc-if value="{{ showHomeDone }}" hint-placeholder-val="{{ false }}">
+          <div onClick="{{ endHomeEdit }}" style="height: 40px; display: flex; align-items: center; justify-content: center; padding: 0 6px; margin-left: -6px; border-radius: 10px; cursor: pointer; font-family: {{ T.font }}; font-size: 14.5px; font-weight: 400; color: {{ T.sub }}; letter-spacing: -0.01em; -webkit-tap-highlight-color: rgba(0,0,0,0.1);">{{ L.done }}</div>
         </sc-if>
       </div>
-      <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
-        <div onClick="{{ openSettings }}" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; margin-right: -10px; border-radius: 10px; cursor: pointer; -webkit-tap-highlight-color: rgba(0,0,0,0.1);">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="{{ T.sub }}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h9M18.5 8H20M4 16h3.5M13 16h7"></path><circle cx="15.5" cy="8" r="2.4"></circle><circle cx="10" cy="16" r="2.4"></circle></svg>
-        </div>
-      </sc-if>
-      <sc-if value="{{ isTrip }}" hint-placeholder-val="{{ false }}">
-        <div style="display: flex; gap: 2px; margin-right: -8px;">
-          <div onClick="{{ openTripSheet }}" style="width: 40px; height: 44px; display: flex; align-items: center; justify-content: center; cursor: pointer;">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="{{ T.accent }}"><circle cx="5" cy="12" r="1.9"></circle><circle cx="12" cy="12" r="1.9"></circle><circle cx="19" cy="12" r="1.9"></circle></svg>
+      <div style="position: absolute; left: 72px; right: 72px; top: 0; bottom: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; pointer-events: none; text-align: center;">
+        <div style="font-family: {{ T.displayF }}; font-stretch: {{ T.wide }}; font-size: {{ T.titleS }}; font-weight: {{ T.titleW }}; color: {{ T.titleC }}; letter-spacing: {{ T.titleLS }}; text-transform: {{ T.titleTT }}; line-height: 1.15; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ title }}</div>
+        <sc-if value="{{ showTripSubtitle }}" hint-placeholder-val="{{ false }}">
+          <div style="font-size: 12px; color: {{ T.titleSub }}; line-height: 1.2; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ tripSubtitle }}</div>
+        </sc-if>
+      </div>
+      <div style="position: relative; z-index: 1; display: flex; align-items: center; justify-content: flex-end; min-width: 80px;">
+        <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+          <div onClick="{{ openSettings }}" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; margin-right: -8px; border-radius: 10px; cursor: pointer; -webkit-tap-highlight-color: rgba(0,0,0,0.1);">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="{{ T.sub }}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h9M18.5 8H20M4 16h3.5M13 16h7"></path><circle cx="15.5" cy="8" r="2.4"></circle><circle cx="10" cy="16" r="2.4"></circle></svg>
           </div>
-          <div onClick="{{ openAdd }}" style="width: 40px; height: 44px; display: flex; align-items: center; justify-content: center; cursor: pointer;">
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="{{ T.accent }}" stroke-width="1.7" stroke-linecap="{{ T.plusCap }}"><rect x="2.8" y="2.8" width="18.4" height="18.4" rx="{{ T.plusRx }}"></rect><path d="M12 8v8M8 12h8"></path></svg>
+        </sc-if>
+        <sc-if value="{{ isTrip }}" hint-placeholder-val="{{ false }}">
+          <div style="display: flex; align-items: center; margin-right: -6px;">
+            <div onClick="{{ openTripSheet }}" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="{{ T.accent }}"><circle cx="5" cy="12" r="1.9"></circle><circle cx="12" cy="12" r="1.9"></circle><circle cx="19" cy="12" r="1.9"></circle></svg>
+            </div>
+            <div onClick="{{ openAdd }}" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="{{ T.accent }}" stroke-width="1.7" stroke-linecap="{{ T.plusCap }}"><rect x="2.8" y="2.8" width="18.4" height="18.4" rx="{{ T.plusRx }}"></rect><path d="M12 8v8M8 12h8"></path></svg>
+            </div>
           </div>
-        </div>
-      </sc-if>
-      <sc-if value="{{ plainHeaderRight }}" hint-placeholder-val="{{ false }}">
-        <div style="width: 36px; height: 44px;"></div>
-      </sc-if>
+        </sc-if>
+      </div>
     </div>
 
     <div style="flex: 1; overflow: hidden; display: flex; flex-direction: column; min-height: 0; position: relative;">
@@ -1356,9 +1357,9 @@ class Component extends DCLogic {
     v.showHomeDone = v.isHome && !!st.homeEditing;
     v.showNewTrip = !st.homeEditing;
     v.canGoBack = !v.isHome;
-    v.plainHeaderRight = !v.isHome && !v.isTrip;
     // Home content uses 20px side padding — keep header actions on the same edge.
-    v.headerPad = v.isHome ? '8px 20px 14px' : T.headPad;
+    // Keep vertical padding tight so the bar sits closer to content.
+    v.headerPad = '4px 20px 4px';
     v.scrollOverflow = st.drag ? 'hidden' : 'auto';
     v.scrollTouch = st.drag ? 'none' : 'pan-y';
     v.title = v.isHome ? L.packingLists
