@@ -133,13 +133,13 @@
             </sc-if>
           </div>
           <sc-for list="{{ trips }}" as="t" hint-placeholder-count="2">
-            <div style="border: {{ T.cardBorderW }} solid {{ t.border }}; border-radius: {{ T.cardR }}; padding: 16px 10px 16px 12px; display: flex; align-items: center; gap: 8px; background: {{ t.cardBg }}; position: relative; box-shadow: {{ t.shadow }};">
+            <div ref="{{ t.ref }}" style="display: flex; align-items: center; gap: 10px; position: relative; z-index: {{ t.z }}; transition: transform 0.16s ease; transform: translateY({{ t.ty }}px);">
               <sc-if value="{{ homeEditing }}" hint-placeholder-val="{{ false }}">
-                <div onClick="{{ t.remove }}" style="width: 28px; height: 28px; border-radius: 50%; background: {{ T.danger }}; display: flex; align-items: center; justify-content: center; cursor: pointer; flex: none;">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"><path d="M6 12h12"></path></svg>
+                <div onClick="{{ t.askDelete }}" style="width: 30px; height: 30px; border-radius: 50%; background: #ff3b30; display: flex; align-items: center; justify-content: center; cursor: pointer; flex: none;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><path d="M6 12h12"></path></svg>
                 </div>
               </sc-if>
-              <div onClick="{{ t.open }}" style="flex: 1; display: flex; flex-direction: column; gap: 12px; cursor: {{ t.cardCursor }}; min-width: 0;">
+              <div onClick="{{ t.open }}" style="flex: 1; min-width: 0; border: {{ T.cardBorderW }} solid {{ t.border }}; border-radius: {{ T.cardR }}; padding: 16px 16px; display: flex; flex-direction: column; gap: 12px; background: {{ t.cardBg }}; box-shadow: {{ t.shadow }}; cursor: {{ t.cardCursor }};">
                 <div style="display: flex; align-items: flex-start; gap: 12px;">
                   <div style="flex: 1; display: flex; flex-direction: column; gap: 5px; min-width: 0;">
                     <div style="display: flex; align-items: center; gap: 7px; min-width: 0;">
@@ -164,13 +164,12 @@
                 </div>
               </div>
               <sc-if value="{{ homeEditing }}" hint-placeholder-val="{{ false }}">
-                <div style="display: flex; flex-direction: column; gap: 2px; flex: none;">
-                  <div onClick="{{ t.moveUp }}" style="width: 36px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: {{ t.upCursor }}; opacity: {{ t.upOpacity }};">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="{{ T.ink }}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 14l6-6 6 6"></path></svg>
-                  </div>
-                  <div onClick="{{ t.moveDown }}" style="width: 36px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: {{ t.downCursor }}; opacity: {{ t.downOpacity }};">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="{{ T.ink }}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 10l6 6 6-6"></path></svg>
-                  </div>
+                <div onPointerDown="{{ t.dragStart }}" onPointerMove="{{ t.dragMove }}" onPointerUp="{{ t.dragEnd }}" onPointerCancel="{{ t.dragEnd }}" style="width: 44px; height: 56px; display: flex; align-items: center; justify-content: center; cursor: grab; touch-action: none; flex: none; margin-right: -4px;">
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="{{ T.ink }}" aria-hidden="true">
+                    <rect x="3" y="5.5" width="18" height="2.8" rx="1.4"></rect>
+                    <rect x="3" y="10.6" width="18" height="2.8" rx="1.4"></rect>
+                    <rect x="3" y="15.7" width="18" height="2.8" rx="1.4"></rect>
+                  </svg>
                 </div>
               </sc-if>
             </div>
@@ -490,6 +489,17 @@
       </div>
     </sc-if>
 
+    <sc-if value="{{ confirmOpen }}" hint-placeholder-val="{{ false }}">
+      <div onClick="{{ closeConfirm }}" style="position: absolute; inset: 0; background: rgba(22,28,26,0.32); display: flex; flex-direction: column; justify-content: flex-end;">
+        <div style="background: {{ T.sheetBg }}; border-top: {{ T.sheetBorder }}; border-radius: {{ T.sheetR }}; padding: 8px 0 14px; animation: sheetUp 0.22s ease;">
+          <div style="text-align: center; font-size: 15px; color: {{ T.ink }}; padding: 18px 24px 14px; line-height: 1.45;">{{ confirmMessage }}</div>
+          <div onClick="{{ confirmDelete }}" style="padding: 17px 20px; text-align: center; font-size: 17px; border-top: 1px solid #f2f4f3; color: {{ T.danger }}; cursor: pointer; font-weight: 600;">{{ L.delete }}</div>
+          <div style="height: 8px; background: #f7f8f8; margin: 8px 0 0;"></div>
+          <div onClick="{{ closeConfirm }}" style="padding: 17px 20px; text-align: center; font-size: 17px; color: #8d9493; cursor: pointer;">{{ L.cancel }}</div>
+        </div>
+      </div>
+    </sc-if>
+
     <sc-if value="{{ modalOpen }}" hint-placeholder-val="{{ false }}">
       <div style="position: absolute; inset: 0; background: rgba(22,28,26,0.32); display: flex; flex-direction: column; justify-content: flex-end;">
         <div style="background: {{ T.sheetBg }}; border-top: {{ T.sheetBorder }}; border-radius: {{ T.sheetR }}; padding: 20px 20px 22px; animation: sheetUp 0.22s ease; display: flex; flex-direction: column; gap: 10px;">
@@ -546,6 +556,7 @@ const STR = {
     savedNote: 'Every change is saved on this device automatically.',
     resetChecks: 'Reset all checkmarks', markAllPacked: 'Mark everything packed', expandAll: 'Expand all categories',
     editTrip: 'Edit', saveAsTemplate: 'Save trip as a template', deleteTrip: 'Delete this trip',
+    deleteTripConfirm: 'Are you sure you want to delete this trip?',
     exportTitle: 'Export template', exportHint: 'Plain Markdown — copy it or download a .md file.', copy: 'Copy', copied: 'Copied',
     importTitle: 'Import template', importHint: 'Paste a list: “# Name”, “## Category”, then one item per line.', importCta: 'Import', downloadMd: 'Download .md file'
   },
@@ -567,6 +578,7 @@ const STR = {
     savedNote: '所有修改会自动保存在本机。',
     resetChecks: '清空全部勾选', markAllPacked: '全部标记完成', expandAll: '展开所有类别',
     editTrip: '编辑', saveAsTemplate: '存为模板', deleteTrip: '删除此行程',
+    deleteTripConfirm: '确定你要删除这个行程吗？',
     exportTitle: '导出模板', exportHint: '纯 Markdown 文本，可复制或下载 .md 文件。', copy: '复制', copied: '已复制',
     importTitle: '导入模板', importHint: '粘贴清单：“# 名称”“## 类别”，之后每行一项。', importCta: '导入', downloadMd: '下载 .md 文件'
   },
@@ -588,6 +600,7 @@ const STR = {
     savedNote: 'Chaque modification est enregistrée sur cet appareil.',
     resetChecks: 'Décocher tout', markAllPacked: 'Tout cocher', expandAll: 'Déplier les catégories',
     editTrip: 'Modifier', saveAsTemplate: 'Enregistrer comme modèle', deleteTrip: 'Supprimer ce voyage',
+    deleteTripConfirm: 'Voulez-vous vraiment supprimer ce voyage ?',
     exportTitle: 'Exporter le modèle', exportHint: 'Markdown simple — copiez-le ou téléchargez un .md.', copy: 'Copier', copied: 'Copié',
     importTitle: 'Importer un modèle', importHint: 'Collez une liste : « # Nom », « ## Catégorie », puis un article par ligne.', importCta: 'Importer', downloadMd: 'Télécharger le .md'
   }
@@ -1100,6 +1113,8 @@ class Component extends DCLogic {
       collapsed: {},
       swiped: null,
       homeEditing: false,
+      confirmDeleteId: null,
+      drag: null,
       draft: { name: '', start: '', end: '', tpl: 'short' },
       newItem: { id: null, name: '', cat: 'misc' },
       tplDraft: { name: '', cat: 'misc' },
@@ -1111,6 +1126,8 @@ class Component extends DCLogic {
     };
     this.px = 0;
     this.py = 0;
+    this.rows = {};
+    this.moved = false;
   }
 
   measureScroll() {
@@ -1218,22 +1235,9 @@ class Component extends DCLogic {
   editedTpl() { return this.tpls().filter(t => t.id === this.state.editTplId)[0] || null; }
 
   go(screen, extra) {
-    const next = { screen: screen, swiped: null, sheet: null, ...(extra || {}) };
+    const next = { screen: screen, swiped: null, sheet: null, drag: null, confirmDeleteId: null, ...(extra || {}) };
     if (screen !== 'home') next.homeEditing = false;
     this.setState(next);
-  }
-
-  moveTrip(id, dir) {
-    this.setTrips(list => {
-      const i = list.findIndex(t => t.id === id);
-      const j = i + dir;
-      if (i < 0 || j < 0 || j >= list.length) return list;
-      const a = list.slice();
-      const tmp = a[i];
-      a[i] = a[j];
-      a[j] = tmp;
-      return a;
-    });
   }
 
   fmtDay(iso) {
@@ -1375,8 +1379,17 @@ class Component extends DCLogic {
     v.goBack = () => this.go(BACK[st.screen] || 'home');
     v.openSettings = () => this.go('settings');
     v.openTemplates = () => this.go('templates');
-    v.startHomeEdit = () => this.setState({ homeEditing: true });
-    v.endHomeEdit = () => this.setState({ homeEditing: false });
+    v.startHomeEdit = () => this.setState({ homeEditing: true, confirmDeleteId: null, drag: null });
+    v.endHomeEdit = () => this.setState({ homeEditing: false, confirmDeleteId: null, drag: null });
+    v.closeConfirm = () => this.setState({ confirmDeleteId: null });
+    v.confirmDelete = () => {
+      const id = this.state.confirmDeleteId;
+      if (!id) return;
+      this.setTrips(list => list.filter(x => x.id !== id));
+      this.setState({ confirmDeleteId: null });
+    };
+    v.confirmOpen = !!st.confirmDeleteId;
+    v.confirmMessage = L.deleteTripConfirm;
     v.startCreate = () => this.go('create', { draft: { name: '', start: '', end: '', tpl: 'short' }, editTripId: null });
     v.openAdd = () => this.go('add', { newItem: { id: null, name: '', cat: 'misc' } });
     v.openTripSheet = () => this.setState({ sheet: 'trip' });
@@ -1410,6 +1423,7 @@ class Component extends DCLogic {
     v.showTripDates = this.props.showTripDates !== false;
     v.hideTripDates = this.props.showTripDates === false;
     const editingHome = !!st.homeEditing;
+    const drag = st.drag;
     const ordered = st.trips.slice();
     v.trips = ordered.map((t, i) => {
       const total = t.items.length;
@@ -1417,8 +1431,14 @@ class Component extends DCLogic {
       const range = [this.fmtDay(t.start), this.fmtDay(t.end)].filter(Boolean).join(' – ');
       const nl = this.nightsLabel(t.start, t.end);
       const complete = total > 0 && done === total;
-      const canUp = i > 0;
-      const canDown = i < ordered.length - 1;
+      const isDragged = !!drag && drag.id === t.id;
+      let ty = 0;
+      if (drag && !isDragged) {
+        if (drag.over > drag.index && i > drag.index && i <= drag.over) ty = -drag.h;
+        else if (drag.over < drag.index && i >= drag.over && i < drag.index) ty = drag.h;
+      } else if (isDragged) {
+        ty = drag.dy;
+      }
       return {
         name: t.name,
         complete: complete,
@@ -1431,19 +1451,43 @@ class Component extends DCLogic {
         cardBg: T.cardBg,
         pct: total ? Math.round((done / total) * 100) : 0,
         border: T.cardBorderC,
-        shadow: T.cardShadow,
+        shadow: isDragged ? T.cardShadowDrag : T.cardShadow,
         cardCursor: editingHome ? 'default' : 'pointer',
-        upCursor: canUp ? 'pointer' : 'default',
-        downCursor: canDown ? 'pointer' : 'default',
-        upOpacity: canUp ? '1' : '0.25',
-        downOpacity: canDown ? '1' : '0.25',
+        ty: ty,
+        z: isDragged ? 5 : 1,
+        ref: el => { if (el) this.rows[t.id] = el; },
         open: () => {
-          if (this.state.homeEditing) return;
+          if (this.state.homeEditing || this.moved) return;
           this.go('trip', { activeId: t.id, hidePacked: !!this.props.hidePackedByDefault, collapsed: {} });
         },
-        remove: () => this.setTrips(list => list.filter(x => x.id !== t.id)),
-        moveUp: () => { if (canUp) this.moveTrip(t.id, -1); },
-        moveDown: () => { if (canDown) this.moveTrip(t.id, 1); }
+        askDelete: () => this.setState({ confirmDeleteId: t.id, drag: null }),
+        dragStart: e => {
+          const el = this.rows[t.id];
+          const h = (el ? el.offsetHeight : 104) + 12;
+          this.py = e.clientY;
+          this.moved = false;
+          if (e.currentTarget.setPointerCapture) e.currentTarget.setPointerCapture(e.pointerId);
+          this.setState({ drag: { id: t.id, index: i, over: i, dy: 0, h: h } });
+        },
+        dragMove: e => {
+          const d = this.state.drag;
+          if (!d || d.id !== t.id) return;
+          const dy = e.clientY - this.py;
+          if (Math.abs(dy) > 4) this.moved = true;
+          const over = Math.max(0, Math.min(ordered.length - 1, d.index + Math.round(dy / d.h)));
+          this.setState({ drag: { ...d, dy: dy, over: over } });
+        },
+        dragEnd: () => {
+          const d = this.state.drag;
+          if (d && d.over !== d.index) {
+            const a = ordered.slice();
+            const m = a.splice(d.index, 1)[0];
+            a.splice(d.over, 0, m);
+            this.setTrips(() => a);
+          }
+          this.setState({ drag: null });
+          setTimeout(() => { this.moved = false; }, 120);
+        }
       };
     });
 
